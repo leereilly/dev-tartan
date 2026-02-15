@@ -495,7 +495,7 @@
     // Event listeners
     document.getElementById('tartan-form').addEventListener('submit', (e) => {
       e.preventDefault();
-      const username = document.getElementById('username').value.trim();
+      const username = document.getElementById('username').value.trim().replace(/^@/, '');
       if (username) generateTartan(username);
     });
 
@@ -503,7 +503,7 @@
 
     // Generate on URL hash
     if (window.location.hash) {
-      const username = decodeURIComponent(window.location.hash.slice(1));
+      const username = decodeURIComponent(window.location.hash.slice(1)).replace(/^@/, '');
       if (username) {
         document.getElementById('username').value = username;
         generateTartan(username);
