@@ -123,6 +123,41 @@
       background: #3a6b45;
     }
 
+    .share-links {
+      display: none;
+      gap: 0.6rem;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .share-links span {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.95rem;
+      color: #6b5240;
+    }
+
+    .share-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-family: 'Crimson Text', serif;
+      font-size: 0.9rem;
+      color: #6b5240;
+      text-decoration: none;
+      padding: 0.3rem 0.6rem;
+      border: 1px solid #c4b48a;
+      border-radius: 3px;
+      transition: all 0.2s;
+    }
+
+    .share-links a:hover {
+      color: #8b2500;
+      border-color: #8b2500;
+      background: rgba(139,37,0,0.04);
+    }
+
     .tartan-container {
       position: relative;
       margin-bottom: 1.5rem;
@@ -236,6 +271,14 @@
     <h3>Thread Count</h3>
     <div class="sett-colors" id="sett-colors"></div>
     <div class="sett-thread-count" id="sett-thread-count"></div>
+  </div>
+
+  <div class="share-links" id="share-links">
+    <span>Share:</span>
+    <a id="share-x" href="#" target="_blank" rel="noopener">𝕏</a>
+    <a id="share-bluesky" href="#" target="_blank" rel="noopener">Bluesky</a>
+    <a id="share-linkedin" href="#" target="_blank" rel="noopener">LinkedIn</a>
+    <a id="share-threads" href="#" target="_blank" rel="noopener">Threads</a>
   </div>
 
   <footer>
@@ -494,6 +537,28 @@
 
       // Use the tartan as a repeating background with high contrast (near-white)
       setTartanBackground(sett);
+
+      // Update share links
+      updateShareLinks(username);
+    }
+
+    // Update social share links
+    function updateShareLinks(username) {
+      const url = `https://leereilly.net/dev-tartan?username=${encodeURIComponent(username)}`;
+      const text = `I generated my developer tartan: ${url}`;
+      const encodedText = encodeURIComponent(text);
+      const encodedUrl = encodeURIComponent(url);
+
+      document.getElementById('share-x').href =
+        `https://x.com/intent/tweet?text=${encodedText}`;
+      document.getElementById('share-bluesky').href =
+        `https://bsky.app/intent/compose?text=${encodedText}`;
+      document.getElementById('share-linkedin').href =
+        `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+      document.getElementById('share-threads').href =
+        `https://threads.net/intent/post?text=${encodedText}`;
+
+      document.getElementById('share-links').style.display = 'flex';
     }
 
     // Set the page background to a faded repeating tartan tile
@@ -541,19 +606,31 @@
     document.getElementById('tartan-form').addEventListener('submit', (e) => {
       e.preventDefault();
       const username = document.getElementById('username').value.trim().replace(/^@/, '');
-      if (username) generateTartan(username);
+      if (username) {
+        // Update URL with query parameter (no page reload)
+        const url = new URL(window.location);
+        url.searchParams.set('username', username);
+        url.hash = '';
+        window.history.replaceState({}, '', url);
+        generateTartan(username);
+      }
     });
 
     document.getElementById('download-btn').addEventListener('click', downloadSVG);
 
-    // Generate on URL hash
-    if (window.location.hash) {
-      const username = decodeURIComponent(window.location.hash.slice(1)).replace(/^@/, '');
+    // Generate from ?username= query parameter or #hash on page load
+    (function autoGenerate() {
+      const params = new URLSearchParams(window.location.search);
+      const fromQuery = (params.get('username') || '').trim().replace(/^@/, '');
+      const fromHash = window.location.hash
+        ? decodeURIComponent(window.location.hash.slice(1)).replace(/^@/, '')
+        : '';
+      const username = fromQuery || fromHash;
       if (username) {
         document.getElementById('username').value = username;
         generateTartan(username);
       }
-    }
+    })();
   </script>
 </body>
 </html>
