@@ -491,6 +491,50 @@
       document.getElementById('display-name').textContent = username;
 
       displaySett(sett);
+
+      // Use the tartan as a repeating background with high contrast (near-white)
+      setTartanBackground(sett);
+    }
+
+    // Set the page background to a faded repeating tartan tile
+    function setTartanBackground(sett) {
+      const tileSize = 160;
+      const symmetricSett = expandSett(sett);
+      const repeatWidth = symmetricSett.reduce((sum, s) => sum + s.width, 0);
+      if (repeatWidth === 0) return;
+      const scale = tileSize / repeatWidth;
+
+      let svgParts = [];
+      svgParts.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${tileSize}" height="${tileSize}">`);
+      // White base so the washed-out pattern stays near-white
+      svgParts.push(`<rect width="${tileSize}" height="${tileSize}" fill="#f4edd3"/>`);
+
+      // Warp (vertical stripes) at very low opacity
+      svgParts.push(`<g opacity="0.08">`);
+      let x = 0;
+      for (const stripe of symmetricSett) {
+        const w = stripe.width * scale;
+        svgParts.push(`<rect x="${x}" y="0" width="${Math.ceil(w)}" height="${tileSize}" fill="${stripe.color.hex}"/>`);
+        x += w;
+      }
+      svgParts.push(`</g>`);
+
+      // Weft (horizontal stripes) at very low opacity
+      svgParts.push(`<g opacity="0.06">`);
+      let y = 0;
+      for (const stripe of symmetricSett) {
+        const h = stripe.width * scale;
+        svgParts.push(`<rect x="0" y="${y}" width="${tileSize}" height="${Math.ceil(h)}" fill="${stripe.color.hex}"/>`);
+        y += h;
+      }
+      svgParts.push(`</g>`);
+
+      svgParts.push(`</svg>`);
+
+      const svgDataUri = 'data:image/svg+xml,' + encodeURIComponent(svgParts.join(''));
+      document.body.style.backgroundImage = `url("${svgDataUri}")`;
+      document.body.style.backgroundRepeat = 'repeat';
+      document.body.style.backgroundSize = `${tileSize}px ${tileSize}px`;
     }
 
     // Event listeners
