@@ -1,8 +1,10 @@
-# 🏴 Dev Tartan
+# Dev Tartan
 
 **Every developer deserves their own clan.**
 
 Dev Tartan generates a unique, deterministic tartan pattern from any GitHub username. Same username, same tartan, every time. It's like a coat of arms, but for people who think `vim` vs `emacs` is a hill worth dying on.
+
+Built using [GitHub Copilot CLI](https://github.com/features/copilot/cli) for the [GitHub Copilot CLI Challenge](https://dev.to/leereilly/dev-tartan-deterministic-plaid-from-a-github-username-101m).
 
 👉 **[Try it live](https://leereilly.net/dev-tartan)**
 
