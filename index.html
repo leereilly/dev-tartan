@@ -399,8 +399,8 @@
       return [...forward, ...reverse];
     }
 
-    // Render the tartan SVG
-    function renderTartan(svg, sett, size = 500) {
+    // Render the tartan SVG with weaving animation
+    function renderTartan(svg, sett, size = 500, animate = true) {
       svg.innerHTML = '';
       svg.setAttribute('width', size);
       svg.setAttribute('height', size);
@@ -416,19 +416,31 @@
       const targetRepeats = 3;
       const scale = size / (repeatWidth * targetRepeats);
 
-      // Create defs for the pattern
+      // Create defs for the pattern and clip path
       const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+
+      // Clip path to keep everything inside the canvas
+      const clipPath = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+      clipPath.setAttribute('id', 'tartan-clip');
+      const clipRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      clipRect.setAttribute('width', size);
+      clipRect.setAttribute('height', size);
+      clipPath.appendChild(clipRect);
+      defs.appendChild(clipPath);
 
       // Background
       const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
       bg.setAttribute('width', size);
       bg.setAttribute('height', size);
       bg.setAttribute('fill', sett[0].color.hex);
+      if (animate) bg.setAttribute('opacity', '0');
       svg.appendChild(bg);
 
       // Draw warp (vertical stripes) with reduced opacity
       const warpGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       warpGroup.setAttribute('opacity', '0.9');
+      warpGroup.setAttribute('clip-path', 'url(#tartan-clip)');
+      const warpRects = [];
       let x = 0;
       while (x < size) {
         for (const stripe of symmetricSett) {
@@ -436,11 +448,16 @@
           if (x + w > size + w) break;
           const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
           rect.setAttribute('x', x);
-          rect.setAttribute('y', 0);
           rect.setAttribute('width', Math.ceil(w));
           rect.setAttribute('height', size);
           rect.setAttribute('fill', stripe.color.hex);
+          if (animate) {
+            rect.setAttribute('y', -size);
+          } else {
+            rect.setAttribute('y', 0);
+          }
           warpGroup.appendChild(rect);
+          warpRects.push(rect);
           x += w;
         }
       }
@@ -450,18 +467,25 @@
       const weftGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       weftGroup.setAttribute('opacity', '0.55');
       weftGroup.setAttribute('style', 'mix-blend-mode: multiply;');
+      weftGroup.setAttribute('clip-path', 'url(#tartan-clip)');
+      const weftRects = [];
       let y = 0;
       while (y < size) {
         for (const stripe of symmetricSett) {
           const h = stripe.width * scale;
           if (y + h > size + h) break;
           const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-          rect.setAttribute('x', 0);
           rect.setAttribute('y', y);
-          rect.setAttribute('width', size);
           rect.setAttribute('height', Math.ceil(h));
+          rect.setAttribute('width', size);
           rect.setAttribute('fill', stripe.color.hex);
+          if (animate) {
+            rect.setAttribute('x', -size);
+          } else {
+            rect.setAttribute('x', 0);
+          }
           weftGroup.appendChild(rect);
+          weftRects.push(rect);
           y += h;
         }
       }
@@ -493,7 +517,78 @@
       twillOverlay.setAttribute('width', size);
       twillOverlay.setAttribute('height', size);
       twillOverlay.setAttribute('fill', 'url(#twill)');
+      if (animate) twillOverlay.setAttribute('opacity', '0');
       svg.appendChild(twillOverlay);
+
+      // Animate the weaving
+      if (animate) {
+        animateWeaving(bg, warpRects, weftRects, twillOverlay, size);
+      }
+    }
+
+    // Animate warp threads dropping in, then weft threads sliding in
+    function animateWeaving(bg, warpRects, weftRects, twillOverlay, size) {
+      const warpDuration = 600;   // ms for all warp threads
+      const weftDuration = 600;   // ms for all weft threads
+      const staggerMax = 80;      // max stagger offset between first and last thread
+      const easeOut = t => 1 - Math.pow(1 - t, 3); // cubic ease-out
+
+      // Fade in background
+      bg.setAttribute('opacity', '1');
+      bg.style.transition = 'opacity 0.3s ease';
+
+      const startTime = performance.now();
+
+      function tick(now) {
+        const elapsed = now - startTime;
+
+        // Phase 1: Warp threads drop in (0 → warpDuration)
+        if (elapsed < warpDuration + staggerMax) {
+          for (let i = 0; i < warpRects.length; i++) {
+            const stagger = (i / Math.max(warpRects.length - 1, 1)) * staggerMax;
+            const t = Math.max(0, Math.min(1, (elapsed - stagger) / warpDuration));
+            const easedT = easeOut(t);
+            const yPos = -size + easedT * size;
+            warpRects[i].setAttribute('y', yPos);
+          }
+        } else {
+          // Snap warp to final position
+          for (const r of warpRects) r.setAttribute('y', 0);
+        }
+
+        // Phase 2: Weft threads slide in (after warp finishes, with slight overlap)
+        const weftStart = warpDuration * 0.6;
+        if (elapsed > weftStart) {
+          const weftElapsed = elapsed - weftStart;
+          for (let i = 0; i < weftRects.length; i++) {
+            const stagger = (i / Math.max(weftRects.length - 1, 1)) * staggerMax;
+            const t = Math.max(0, Math.min(1, (weftElapsed - stagger) / weftDuration));
+            const easedT = easeOut(t);
+            const xPos = -size + easedT * size;
+            weftRects[i].setAttribute('x', xPos);
+          }
+        }
+
+        // Phase 3: Fade in twill overlay
+        const twillStart = weftStart + weftDuration * 0.5;
+        if (elapsed > twillStart) {
+          const twillT = Math.min(1, (elapsed - twillStart) / 400);
+          twillOverlay.setAttribute('opacity', twillT);
+        }
+
+        // Keep animating until everything is done
+        const totalDuration = weftStart + weftDuration + staggerMax + 400;
+        if (elapsed < totalDuration) {
+          requestAnimationFrame(tick);
+        } else {
+          // Snap everything to final state
+          for (const r of warpRects) r.setAttribute('y', 0);
+          for (const r of weftRects) r.setAttribute('x', 0);
+          twillOverlay.setAttribute('opacity', '1');
+        }
+      }
+
+      requestAnimationFrame(tick);
     }
 
     // Display the sett information
