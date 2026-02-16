@@ -395,10 +395,125 @@
       filter: drop-shadow(0 4px 12px rgba(44,24,16,0.18));
     }
 
+    /* ── Gallery ──────────────────────────────────────────── */
+    .gallery-section {
+      width: 100%;
+      max-width: 900px;
+      margin: 1rem auto 2rem;
+      text-align: center;
+    }
+
+    .gallery-section .divider { margin: 0 auto 0.5rem; }
+
+    .gallery-section h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: #3d2b1f;
+      margin-bottom: 0.25rem;
+    }
+
+    .gallery-section p.gallery-subtitle {
+      font-size: 1rem;
+      font-style: italic;
+      color: #6b5240;
+      margin-bottom: 1.25rem;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 1rem;
+      padding: 0 0.5rem;
+    }
+
+    .gallery-card {
+      position: relative;
+      cursor: pointer;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 2px solid #c4b48a;
+      background: #faf6e9;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      aspect-ratio: 1;
+    }
+
+    .gallery-card:hover {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: 0 8px 24px rgba(44,24,16,0.18);
+      border-color: #8b2500;
+    }
+
+    .gallery-card svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .gallery-card .card-info {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 8px;
+      background: linear-gradient(transparent, rgba(26,15,8,0.85));
+      transition: opacity 0.2s;
+    }
+
+    .gallery-card .card-avatar {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.6);
+      flex-shrink: 0;
+    }
+
+    .gallery-card .card-username {
+      font-family: 'Crimson Text', serif;
+      font-size: 0.8rem;
+      color: #f0e8d0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .gallery-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 2rem;
+      color: #8b774b;
+      font-style: italic;
+    }
+
+    .gallery-loading .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid #c4b48a;
+      border-top-color: #8b2500;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .gallery-section.hidden {
+      display: none;
+    }
+
     @media (max-width: 600px) {
       header h1 { font-size: 2rem; }
       .input-section { width: 100%; padding: 0 0.5rem; }
       .input-section input[type="text"] { width: 100%; max-width: 300px; }
+      .gallery-grid { grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 0.6rem; }
+      .gallery-card .card-info { padding: 4px 5px; }
+      .gallery-card .card-avatar { width: 16px; height: 16px; }
+      .gallery-card .card-username { font-size: 0.7rem; }
     }
   </style>
 </head>
@@ -455,6 +570,15 @@
     <a id="share-linkedin" href="#" target="_blank" rel="noopener" aria-label="Share on LinkedIn">LinkedIn</a>
     <a id="share-threads" href="#" target="_blank" rel="noopener" aria-label="Share on Threads">Threads</a>
   </div>
+
+  <section class="gallery-section" id="gallery-section">
+    <h2>Recently Active Clan Members</h2>
+    <div class="divider"></div>
+    <p class="gallery-subtitle">Tartans of developers active on GitHub right now</p>
+    <div class="gallery-grid" id="gallery-grid">
+      <div class="gallery-loading" id="gallery-loading"><div class="spinner"></div> Fetching from the Highlands&hellip;</div>
+    </div>
+  </section>
 
   <!-- TODO: Add tweed mode. And maybe argyle. Actually no, argyle is for golf. We have standards. -->
   <footer>
@@ -1871,6 +1995,7 @@
         url.hash = '';
         window.history.replaceState({}, '', url);
         generateTartan(username);
+        document.getElementById('gallery-section').classList.add('hidden');
       }
     });
 
@@ -1903,6 +2028,135 @@
       });
     });
 
+    // ── Gallery: show tartans of recently-active GitHub users ────
+    async function renderGalleryTile(username, avatarUrl, container) {
+      const ns = 'http://www.w3.org/2000/svg';
+      const tileSize = 200; // rendered size, CSS scales to fit
+
+      const hashBytes = await sha256(username.toLowerCase());
+      const sett = deriveSett(hashBytes);
+      const symmetricSett = expandSett(sett);
+      const repeatWidth = symmetricSett.reduce((sum, s) => sum + s.width, 0);
+      if (repeatWidth === 0) return;
+      const scale = tileSize / (repeatWidth * 3);
+
+      // Build a lightweight SVG string (faster than DOM for many tiles)
+      let parts = [];
+      parts.push(`<svg xmlns="${ns}" width="${tileSize}" height="${tileSize}" viewBox="0 0 ${tileSize} ${tileSize}">`);
+      parts.push(`<rect width="${tileSize}" height="${tileSize}" fill="${sett[0].color.hex}"/>`);
+
+      // Warp
+      parts.push(`<g opacity="0.9">`);
+      let x = 0;
+      while (x < tileSize) {
+        for (const stripe of symmetricSett) {
+          const w = stripe.width * scale;
+          parts.push(`<rect x="${x}" y="0" width="${Math.ceil(w)}" height="${tileSize}" fill="${stripe.color.hex}"/>`);
+          x += w;
+          if (x > tileSize) break;
+        }
+      }
+      parts.push(`</g>`);
+
+      // Weft
+      parts.push(`<g opacity="0.55" style="mix-blend-mode:multiply">`);
+      let y = 0;
+      while (y < tileSize) {
+        for (const stripe of symmetricSett) {
+          const h = stripe.width * scale;
+          parts.push(`<rect x="0" y="${y}" width="${tileSize}" height="${Math.ceil(h)}" fill="${stripe.color.hex}"/>`);
+          y += h;
+          if (y > tileSize) break;
+        }
+      }
+      parts.push(`</g>`);
+      parts.push(`</svg>`);
+
+      const card = document.createElement('div');
+      card.className = 'gallery-card';
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', `View tartan for ${username}`);
+      card.innerHTML = parts.join('') +
+        `<div class="card-info">` +
+        `<img class="card-avatar" src="${avatarUrl}&s=44" alt="" loading="lazy" onerror="this.style.display='none'">` +
+        `<span class="card-username">${username}</span>` +
+        `</div>`;
+
+      // Click to generate full tartan
+      const activate = () => {
+        document.getElementById('username').value = username;
+        generateTartan(username);
+        document.getElementById('gallery-section').classList.add('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+      card.addEventListener('click', activate);
+      card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); } });
+
+      // Staggered fade-in
+      card.style.opacity = '0';
+      card.style.transform = 'translateY(12px)';
+      card.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+      container.appendChild(card);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          card.style.opacity = '1';
+          card.style.transform = 'translateY(0)';
+        });
+      });
+    }
+
+    async function loadGallery() {
+      const grid = document.getElementById('gallery-grid');
+      const loading = document.getElementById('gallery-loading');
+
+      try {
+        const res = await fetch('https://api.github.com/events?per_page=100');
+        if (!res.ok) throw new Error('API returned ' + res.status);
+        const events = await res.json();
+
+        // Extract unique users (username + avatar), shuffle, take 24
+        const seen = new Set();
+        const users = [];
+        for (const evt of events) {
+          const login = evt.actor && evt.actor.login;
+          const avatar = evt.actor && evt.actor.avatar_url;
+          if (login && avatar && !seen.has(login) && !login.includes('[bot]') && !login.endsWith('-bot') && !login.includes('bot[')) {
+            seen.add(login);
+            users.push({ login, avatar });
+          }
+        }
+
+        // Fisher-Yates shuffle
+        for (let i = users.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [users[i], users[j]] = [users[j], users[i]];
+        }
+
+        const selected = users.slice(0, 24);
+
+        if (selected.length === 0) {
+          loading.innerHTML = '<em>No active users found — try refreshing.</em>';
+          return;
+        }
+
+        loading.remove();
+
+        // Render tiles with a small stagger
+        for (let i = 0; i < selected.length; i++) {
+          const u = selected[i];
+          // Slight stagger delay for visual effect
+          setTimeout(() => renderGalleryTile(u.login, u.avatar, grid), i * 60);
+        }
+      } catch (err) {
+        console.warn('Gallery fetch failed:', err);
+        loading.innerHTML = '<em>Could not fetch recent users — the GitHub API may be resting.</em>';
+      }
+    }
+
+    // Load gallery on page start (don't block main thread)
+    requestAnimationFrame(() => loadGallery());
+
     // Generate from ?username= and ?palette= query parameters or #hash on page load
     (function autoGenerate() {
       const params = new URLSearchParams(window.location.search);
@@ -1920,6 +2174,7 @@
       if (username) {
         document.getElementById('username').value = username;
         generateTartan(username);
+        document.getElementById('gallery-section').classList.add('hidden');
       }
     })();
 
