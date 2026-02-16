@@ -346,6 +346,16 @@
       font-style: italic;
     }
 
+    .character-container {
+      display: none;
+      justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+
+    #character-svg {
+      filter: drop-shadow(0 4px 12px rgba(44,24,16,0.18));
+    }
+
     @media (max-width: 600px) {
       header h1 { font-size: 2rem; }
       .input-section input[type="text"] { width: 200px; }
@@ -378,6 +388,10 @@
     <h3>Thread Count</h3>
     <div class="sett-colors" id="sett-colors"></div>
     <div class="sett-thread-count" id="sett-thread-count"></div>
+  </div>
+
+  <div class="character-container" id="character-container">
+    <svg id="character-svg" width="220" height="340" viewBox="0 0 220 340" xmlns="http://www.w3.org/2000/svg"></svg>
   </div>
 
   <div class="share-links" id="share-links">
@@ -781,6 +795,306 @@
       URL.revokeObjectURL(url);
     }
 
+    // Render an SVG character wearing a kilt with the tartan pattern
+    function renderCharacter(sett) {
+      const svg = document.getElementById('character-svg');
+      svg.innerHTML = '';
+      const ns = 'http://www.w3.org/2000/svg';
+
+      const defs = document.createElementNS(ns, 'defs');
+
+      // Build a tartan pattern for the kilt
+      const symmetricSett = expandSett(sett);
+      const repeatWidth = symmetricSett.reduce((sum, s) => sum + s.width, 0);
+      const patternSize = 60;
+      const scale = patternSize / (repeatWidth || 1);
+
+      const tartanPat = document.createElementNS(ns, 'pattern');
+      tartanPat.setAttribute('id', 'kilt-tartan');
+      tartanPat.setAttribute('width', patternSize);
+      tartanPat.setAttribute('height', patternSize);
+      tartanPat.setAttribute('patternUnits', 'userSpaceOnUse');
+
+      // Pattern background
+      const patBg = document.createElementNS(ns, 'rect');
+      patBg.setAttribute('width', patternSize);
+      patBg.setAttribute('height', patternSize);
+      patBg.setAttribute('fill', sett[0].color.hex);
+      tartanPat.appendChild(patBg);
+
+      // Warp stripes (vertical)
+      const warpG = document.createElementNS(ns, 'g');
+      warpG.setAttribute('opacity', '0.9');
+      let px = 0;
+      for (const stripe of symmetricSett) {
+        const w = stripe.width * scale;
+        const r = document.createElementNS(ns, 'rect');
+        r.setAttribute('x', px); r.setAttribute('y', 0);
+        r.setAttribute('width', Math.ceil(w)); r.setAttribute('height', patternSize);
+        r.setAttribute('fill', stripe.color.hex);
+        warpG.appendChild(r);
+        px += w;
+      }
+      tartanPat.appendChild(warpG);
+
+      // Weft stripes (horizontal)
+      const weftG = document.createElementNS(ns, 'g');
+      weftG.setAttribute('opacity', '0.55');
+      weftG.setAttribute('style', 'mix-blend-mode: multiply;');
+      let py = 0;
+      for (const stripe of symmetricSett) {
+        const h = stripe.width * scale;
+        const r = document.createElementNS(ns, 'rect');
+        r.setAttribute('x', 0); r.setAttribute('y', py);
+        r.setAttribute('width', patternSize); r.setAttribute('height', Math.ceil(h));
+        r.setAttribute('fill', stripe.color.hex);
+        weftG.appendChild(r);
+        py += h;
+      }
+      tartanPat.appendChild(weftG);
+      defs.appendChild(tartanPat);
+
+      // Skin tone gradient
+      const skinGrad = document.createElementNS(ns, 'radialGradient');
+      skinGrad.setAttribute('id', 'skin-grad');
+      const s1 = document.createElementNS(ns, 'stop');
+      s1.setAttribute('offset', '0%'); s1.setAttribute('stop-color', '#f5d0a9');
+      const s2 = document.createElementNS(ns, 'stop');
+      s2.setAttribute('offset', '100%'); s2.setAttribute('stop-color', '#e8b88a');
+      skinGrad.appendChild(s1); skinGrad.appendChild(s2);
+      defs.appendChild(skinGrad);
+
+      svg.appendChild(defs);
+
+      // ── Draw the character ──
+
+      // Legs (behind kilt)
+      const legStyle = 'fill:url(#skin-grad);stroke:#c4956a;stroke-width:1.5';
+      const leftLeg = document.createElementNS(ns, 'rect');
+      leftLeg.setAttribute('x', 75); leftLeg.setAttribute('y', 230);
+      leftLeg.setAttribute('width', 22); leftLeg.setAttribute('height', 65);
+      leftLeg.setAttribute('rx', 8);
+      leftLeg.setAttribute('style', legStyle);
+      svg.appendChild(leftLeg);
+
+      const rightLeg = document.createElementNS(ns, 'rect');
+      rightLeg.setAttribute('x', 123); rightLeg.setAttribute('y', 230);
+      rightLeg.setAttribute('width', 22); rightLeg.setAttribute('height', 65);
+      rightLeg.setAttribute('rx', 8);
+      rightLeg.setAttribute('style', legStyle);
+      svg.appendChild(rightLeg);
+
+      // Knee-high socks (hose)
+      [[75, 260], [123, 260]].forEach(([lx, ly]) => {
+        const sock = document.createElementNS(ns, 'rect');
+        sock.setAttribute('x', lx); sock.setAttribute('y', ly);
+        sock.setAttribute('width', 22); sock.setAttribute('height', 42);
+        sock.setAttribute('rx', 8);
+        sock.setAttribute('style', 'fill:#f0e8d0;stroke:#c4b48a;stroke-width:1');
+        svg.appendChild(sock);
+
+        // Sock cuff fold
+        const cuff = document.createElementNS(ns, 'rect');
+        cuff.setAttribute('x', lx - 1); cuff.setAttribute('y', ly);
+        cuff.setAttribute('width', 24); cuff.setAttribute('height', 8);
+        cuff.setAttribute('rx', 3);
+        cuff.setAttribute('style', 'fill:#f0e8d0;stroke:#c4b48a;stroke-width:1');
+        svg.appendChild(cuff);
+      });
+
+      // Shoes (ghillie brogues)
+      [[71, 295], [119, 295]].forEach(([sx, sy]) => {
+        const shoe = document.createElementNS(ns, 'rect');
+        shoe.setAttribute('x', sx); shoe.setAttribute('y', sy);
+        shoe.setAttribute('width', 30); shoe.setAttribute('height', 14);
+        shoe.setAttribute('rx', 5);
+        shoe.setAttribute('style', 'fill:#3d2b1f;stroke:#2c1810;stroke-width:1');
+        svg.appendChild(shoe);
+      });
+
+      // Kilt (the tartan!)
+      const kilt = document.createElementNS(ns, 'path');
+      kilt.setAttribute('d', 'M65,170 L60,240 Q65,248 110,248 Q155,248 160,240 L155,170 Z');
+      kilt.setAttribute('fill', 'url(#kilt-tartan)');
+      kilt.setAttribute('stroke', '#4a3728');
+      kilt.setAttribute('stroke-width', '1.5');
+      svg.appendChild(kilt);
+
+      // Kilt pleats (subtle lines)
+      for (let kx = 72; kx < 150; kx += 10) {
+        const pleat = document.createElementNS(ns, 'line');
+        pleat.setAttribute('x1', kx); pleat.setAttribute('y1', 180);
+        pleat.setAttribute('x2', kx - 2); pleat.setAttribute('y2', 242);
+        pleat.setAttribute('stroke', 'rgba(0,0,0,0.12)');
+        pleat.setAttribute('stroke-width', '1');
+        svg.appendChild(pleat);
+      }
+
+      // Belt
+      const belt = document.createElementNS(ns, 'rect');
+      belt.setAttribute('x', 65); belt.setAttribute('y', 168);
+      belt.setAttribute('width', 90); belt.setAttribute('height', 8);
+      belt.setAttribute('rx', 2);
+      belt.setAttribute('fill', '#3d2b1f');
+      belt.setAttribute('stroke', '#2c1810');
+      belt.setAttribute('stroke-width', '1');
+      svg.appendChild(belt);
+
+      // Belt buckle
+      const buckle = document.createElementNS(ns, 'rect');
+      buckle.setAttribute('x', 104); buckle.setAttribute('y', 169);
+      buckle.setAttribute('width', 12); buckle.setAttribute('height', 6);
+      buckle.setAttribute('rx', 1);
+      buckle.setAttribute('fill', '#c5a041');
+      buckle.setAttribute('stroke', '#8b774b');
+      buckle.setAttribute('stroke-width', '0.5');
+      svg.appendChild(buckle);
+
+      // Torso / shirt
+      const torso = document.createElementNS(ns, 'path');
+      torso.setAttribute('d', 'M72,105 L65,175 L155,175 L148,105 Q130,95 110,95 Q90,95 72,105 Z');
+      torso.setAttribute('fill', '#f0e8d0');
+      torso.setAttribute('stroke', '#c4b48a');
+      torso.setAttribute('stroke-width', '1.5');
+      svg.appendChild(torso);
+
+      // Shirt collar lines
+      const collarL = document.createElementNS(ns, 'line');
+      collarL.setAttribute('x1', 100); collarL.setAttribute('y1', 97);
+      collarL.setAttribute('x2', 95); collarL.setAttribute('y2', 120);
+      collarL.setAttribute('stroke', '#c4b48a'); collarL.setAttribute('stroke-width', '1');
+      svg.appendChild(collarL);
+      const collarR = document.createElementNS(ns, 'line');
+      collarR.setAttribute('x1', 120); collarR.setAttribute('y1', 97);
+      collarR.setAttribute('x2', 125); collarR.setAttribute('y2', 120);
+      collarR.setAttribute('stroke', '#c4b48a'); collarR.setAttribute('stroke-width', '1');
+      svg.appendChild(collarR);
+
+      // Arms
+      const armStyle = 'fill:url(#skin-grad);stroke:#c4956a;stroke-width:1.5';
+      const leftArm = document.createElementNS(ns, 'path');
+      leftArm.setAttribute('d', 'M72,108 Q55,115 48,145 Q45,160 50,170 L58,168 Q58,155 60,140 Q65,120 75,112 Z');
+      leftArm.setAttribute('style', armStyle);
+      svg.appendChild(leftArm);
+
+      const rightArm = document.createElementNS(ns, 'path');
+      rightArm.setAttribute('d', 'M148,108 Q165,115 172,145 Q175,160 170,170 L162,168 Q162,155 160,140 Q155,120 145,112 Z');
+      rightArm.setAttribute('style', armStyle);
+      svg.appendChild(rightArm);
+
+      // Sporran (pouch hanging from belt)
+      const sporran = document.createElementNS(ns, 'ellipse');
+      sporran.setAttribute('cx', 110); sporran.setAttribute('cy', 200);
+      sporran.setAttribute('rx', 14); sporran.setAttribute('ry', 18);
+      sporran.setAttribute('fill', '#4a3728');
+      sporran.setAttribute('stroke', '#2c1810');
+      sporran.setAttribute('stroke-width', '1');
+      svg.appendChild(sporran);
+
+      // Sporran tassels
+      for (let tx = 103; tx <= 117; tx += 7) {
+        const tassel = document.createElementNS(ns, 'line');
+        tassel.setAttribute('x1', tx); tassel.setAttribute('y1', 215);
+        tassel.setAttribute('x2', tx); tassel.setAttribute('y2', 225);
+        tassel.setAttribute('stroke', '#2c1810');
+        tassel.setAttribute('stroke-width', '2');
+        tassel.setAttribute('stroke-linecap', 'round');
+        svg.appendChild(tassel);
+      }
+
+      // Sporran chain
+      const chain = document.createElementNS(ns, 'path');
+      chain.setAttribute('d', 'M80,178 Q95,188 110,182 Q125,188 140,178');
+      chain.setAttribute('fill', 'none');
+      chain.setAttribute('stroke', '#c5a041');
+      chain.setAttribute('stroke-width', '1.5');
+      svg.appendChild(chain);
+
+      // Head
+      const head = document.createElementNS(ns, 'ellipse');
+      head.setAttribute('cx', 110); head.setAttribute('cy', 65);
+      head.setAttribute('rx', 30); head.setAttribute('ry', 35);
+      head.setAttribute('fill', 'url(#skin-grad)');
+      head.setAttribute('stroke', '#c4956a');
+      head.setAttribute('stroke-width', '1.5');
+      svg.appendChild(head);
+
+      // Hair (simple arc on top)
+      const hair = document.createElementNS(ns, 'path');
+      hair.setAttribute('d', 'M78,55 Q80,28 110,25 Q140,28 142,55 Q138,35 110,33 Q82,35 78,55 Z');
+      hair.setAttribute('fill', '#5a3825');
+      svg.appendChild(hair);
+
+      // Eyes
+      [[98, 60], [122, 60]].forEach(([ex, ey]) => {
+        const eye = document.createElementNS(ns, 'ellipse');
+        eye.setAttribute('cx', ex); eye.setAttribute('cy', ey);
+        eye.setAttribute('rx', 4); eye.setAttribute('ry', 5);
+        eye.setAttribute('fill', 'white');
+        eye.setAttribute('stroke', '#4a3728');
+        eye.setAttribute('stroke-width', '0.8');
+        svg.appendChild(eye);
+        const pupil = document.createElementNS(ns, 'circle');
+        pupil.setAttribute('cx', ex); pupil.setAttribute('cy', ey + 1);
+        pupil.setAttribute('r', 2.5);
+        pupil.setAttribute('fill', '#2c1810');
+        svg.appendChild(pupil);
+        const glint = document.createElementNS(ns, 'circle');
+        glint.setAttribute('cx', ex + 1); glint.setAttribute('cy', ey - 1);
+        glint.setAttribute('r', 0.8);
+        glint.setAttribute('fill', 'white');
+        svg.appendChild(glint);
+      });
+
+      // Smile
+      const smile = document.createElementNS(ns, 'path');
+      smile.setAttribute('d', 'M100,76 Q110,84 120,76');
+      smile.setAttribute('fill', 'none');
+      smile.setAttribute('stroke', '#8b5e3c');
+      smile.setAttribute('stroke-width', '1.5');
+      smile.setAttribute('stroke-linecap', 'round');
+      svg.appendChild(smile);
+
+      // Eyebrows
+      [[93, 52, 103, 50], [117, 50, 127, 52]].forEach(([x1, y1, x2, y2]) => {
+        const brow = document.createElementNS(ns, 'line');
+        brow.setAttribute('x1', x1); brow.setAttribute('y1', y1);
+        brow.setAttribute('x2', x2); brow.setAttribute('y2', y2);
+        brow.setAttribute('stroke', '#5a3825');
+        brow.setAttribute('stroke-width', '2');
+        brow.setAttribute('stroke-linecap', 'round');
+        svg.appendChild(brow);
+      });
+
+      // Tam o'shanter (beret)
+      const tam = document.createElementNS(ns, 'ellipse');
+      tam.setAttribute('cx', 110); tam.setAttribute('cy', 35);
+      tam.setAttribute('rx', 35); tam.setAttribute('ry', 12);
+      tam.setAttribute('fill', 'url(#kilt-tartan)');
+      tam.setAttribute('stroke', '#4a3728');
+      tam.setAttribute('stroke-width', '1.5');
+      svg.appendChild(tam);
+
+      const tamTop = document.createElementNS(ns, 'path');
+      tamTop.setAttribute('d', 'M80,35 Q85,12 110,10 Q135,12 140,35');
+      tamTop.setAttribute('fill', 'url(#kilt-tartan)');
+      tamTop.setAttribute('stroke', '#4a3728');
+      tamTop.setAttribute('stroke-width', '1.5');
+      svg.appendChild(tamTop);
+
+      // Tam pom-pom
+      const pomPom = document.createElementNS(ns, 'circle');
+      pomPom.setAttribute('cx', 110); pomPom.setAttribute('cy', 10);
+      pomPom.setAttribute('r', 6);
+      pomPom.setAttribute('fill', '#c41e3a');
+      pomPom.setAttribute('stroke', '#8b1a1a');
+      pomPom.setAttribute('stroke-width', '0.8');
+      svg.appendChild(pomPom);
+
+      // Show container
+      document.getElementById('character-container').style.display = 'flex';
+    }
+
     // Main generate handler
     async function generateTartan(username) {
       if (bagpipePlaying) stopBagpipes();
@@ -806,6 +1120,8 @@
 
       displaySett(sett);
 
+      // Draw the character wearing the tartan kilt
+      renderCharacter(sett);
       // Use the tartan as a repeating background with high contrast (near-white)
       setTartanBackground(sett);
 

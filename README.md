@@ -84,7 +84,7 @@ Twenty colors inspired by historical Scottish dye sources, from woad-adjacent na
 - 📥 **Downloadable** - export your tartan as SVG
 - 🔗 **Shareable** - URL query parameters (`?username=octocat`) and social sharing links
 - 🪶 **Zero dependencies** - one HTML file, no build step, no npm, no node_modules, no existential dread
-- 🎵 **No bagpipes** - we considered auto-playing _Scotland the Brave_ on page load, but decided some traditions are best left in the Highlands
+- 🎵 **No bagpipes** - ~~we considered auto-playing _Scotland the Brave_ on page load, but decided some traditions are best left in the Highlands~~ We added bagpipes. Each username gets a unique, deterministic tune synthesized via the Web Audio API. You can play it _and_ download it as a WAV file. We regret nothing.
 
 ## Running Locally
 
@@ -96,5 +96,5 @@ That's it. It's a single HTML file. Your build pipeline is your browser.
 
 ## License
 
-Do whatever you want with it. Put it on a kilt. Print it on a mug. Use it as your desktop wallpaper. Make it your GitHub avatar. Tattoo it on your forearm. We're not your parents.
+[MIT](LICENSE). Do whatever you want with it. Put it on a kilt. Print it on a mug. Use it as your desktop wallpaper. Make it your GitHub avatar. Tattoo it on your forearm. We're not your parents.
 
