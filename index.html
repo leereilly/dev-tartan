@@ -1,4 +1,31 @@
 <!DOCTYPE html>
+<!--
+
+    ██████╗ ███████╗██╗   ██╗  ████████╗ █████╗ ██████╗ ████████╗ █████╗ ███╗   ██╗
+    ██╔══██╗██╔════╝██║   ██║  ╚══██╔══╝██╔══██╗██╔══██╗╚══██╔══╝██╔══██╗████╗  ██║
+    ██║  ██║█████╗  ██║   ██║     ██║   ███████║██████╔╝   ██║   ███████║██╔██╗ ██║
+    ██║  ██║██╔══╝  ╚██╗ ██╔╝     ██║   ██╔══██║██╔══██╗   ██║   ██╔══██║██║╚██╗██║
+    ██████╔╝███████╗ ╚████╔╝      ██║   ██║  ██║██║  ██║   ██║   ██║  ██║██║ ╚████║
+    ╚═════╝ ╚══════╝  ╚═══╝       ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝ ╚═══╝
+
+    Every developer deserves their own clan.
+    SHA-256 → Sett → SVG → 🏴󠁧󠁢󠁳󠁣󠁴󠁿
+
+    ┌──────────────────────────────────────────────────────────────────┐
+    │  You're reading the source. Respect.                           │
+    │                                                                │
+    │  Fun facts:                                                    │
+    │  • There are 20 colours per palette × 3 palettes = 60 hues     │
+    │  • SHA-256 gives 2²⁵⁶ possible tartans (~1.16 × 10⁷⁷)        │
+    │  • That's more tartans than atoms in the observable universe    │
+    │  • The bagpipe synth uses Web Audio API oscillators tuned to   │
+    │    a pentatonic scale derived from your username hash           │
+    │                                                                │
+    │  Built with GitHub Copilot CLI                                 │
+    │  https://github.com/leereilly/dev-tartan                       │
+    └──────────────────────────────────────────────────────────────────┘
+
+-->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -375,6 +402,7 @@
     }
   </style>
 </head>
+<!-- If you're reading this, you're the kind of person who views source. We like you. -->
 <body>
   <header>
     <h1>Dev <span class="accent">Tartan</span></h1>
@@ -428,6 +456,7 @@
     <a id="share-threads" href="#" target="_blank" rel="noopener" aria-label="Share on Threads">Threads</a>
   </div>
 
+  <!-- TODO: Add tweed mode. And maybe argyle. Actually no, argyle is for golf. We have standards. -->
   <footer>
     <p>Woven with bits &amp; bytes &bull; SHA-256 &rarr; Sett</p>
     <p><a href="https://github.com/leereilly/dev-tartan" style="color: #8b774b;">Source on GitHub</a> &bull; Built with <a href="http://github.com/features/copilot" style="color: #8b774b;">GitHub Copilot CLI</a> for the <a href="https://dev.to/leereilly/dev-tartan-deterministic-plaid-from-a-github-username-101m" style="color: #8b774b;">GitHub Copilot CLI Coding Challenge</a></p>
@@ -1893,6 +1922,133 @@
         generateTartan(username);
       }
     })();
+
+    // ── Console Easter Eggs ──────────────────────────────────────────
+    (function devConsoleEasterEggs() {
+      // Styled ASCII art banner in the console
+      console.log(
+        '%c' +
+        '╔══════════════════════════════════════════════╗\n' +
+        '║           🏴󠁧󠁢󠁳󠁣󠁴󠁿  DEV TARTAN  🏴󠁧󠁢󠁳󠁣󠁴󠁿              ║\n' +
+        '║  Every developer deserves their own clan.    ║\n' +
+        '╚══════════════════════════════════════════════╝',
+        'color: #c41e3a; font-family: monospace; font-size: 14px; font-weight: bold; text-shadow: 1px 1px 0 #1a472a;'
+      );
+
+      // Fun dev messages
+      console.log(
+        '%c🧶 Weaving secrets into the console since 2025...',
+        'color: #8b774b; font-style: italic; font-size: 12px;'
+      );
+      console.log(
+        '%c💡 Try: %cdevTartan.loom()%c or %cdevTartan.fortune()%c in this console',
+        'color: #6b5240; font-size: 12px;',
+        'color: #8b2500; font-weight: bold; font-size: 12px;',
+        'color: #6b5240; font-size: 12px;',
+        'color: #8b2500; font-weight: bold; font-size: 12px;',
+        'color: #6b5240; font-size: 12px;'
+      );
+      // Secret global object with fun console functions
+      window.devTartan = {
+        loom: function() {
+          const frames = [
+            '  ┌─────────┐  ',
+            '  │ ║║║║║║║ │  ',
+            '  │ ═══════ │  ',
+            '  │ ║║║║║║║ │  ',
+            '  │ ═══════ │  ',
+            '  │ ║║║║║║║ │  ',
+            '  └─────────┘  ',
+            '    🧵🧵🧵🧵    ',
+          ];
+          console.log('%c' + frames.join('\n'), 'color: #8b2500; font-family: monospace; font-size: 14px;');
+          console.log('%c*clack clack clack* 🏴󠁧󠁢󠁳󠁣󠁴󠁿', 'color: #1a472a; font-style: italic;');
+          return '🧶 The loom weaves on...';
+        },
+
+        fortune: function() {
+          const fortunes = [
+            '🏴󠁧󠁢󠁳󠁣󠁴󠁿 A Scotsman never reveals his thread count.',
+            '🧶 Your pull request will be merged... when the Highland cows come home.',
+            '⚔️  In the battle of tabs vs spaces, tartan uses both.',
+            '🎵 Your code review feedback sounds like bagpipes — loud and unsettling.',
+            '🥃 "Any sufficiently advanced tartan is indistinguishable from plaid." — Arthur C. Clarke, probably.',
+            '🐑 A sheep somewhere is judging your CSS.',
+            '💀 git push --force is the digital equivalent of wearing another clan\'s tartan.',
+            '🏔️  Your test coverage is like a Highland winter — sparse and unforgiving.',
+            '🔮 The hash foretells: your next deploy will be on a Friday.',
+            '📜 Ancient Scottish proverb: "He who refactors on main branch courts disaster."',
+            '🦄 There are more possible Dev Tartans than atoms in the universe. Yours is still ugly though.',
+            '🪵 Logging is the tartan of debugging — warp and weft of stdout and stderr.',
+          ];
+          const pick = fortunes[Math.floor(Math.random() * fortunes.length)];
+          console.log('%c' + pick, 'color: #5b2c6f; font-size: 13px; font-style: italic;');
+          return pick;
+        },
+
+        hierarchyOfNeeds: function() {
+          console.log('%c' +
+            '         ╱╲                                 \n' +
+            '        ╱  ╲    Self-actualization           \n' +
+            '       ╱ 🏴󠁧󠁢󠁳󠁣󠁴󠁿 ╲   (Your own tartan)            \n' +
+            '      ╱──────╲                              \n' +
+            '     ╱  Esteem ╲  (GitHub stars)             \n' +
+            '    ╱────────────╲                           \n' +
+            '   ╱  Belonging   ╲ (Merged PRs)            \n' +
+            '  ╱────────────────╲                        \n' +
+            ' ╱    Safety        ╲ (git stash)           \n' +
+            '╱────────────────────╲                      \n' +
+            '╱ Physiological needs  ╲ (WiFi & coffee)    \n' +
+            '╱════════════════════════╲                  ',
+            'color: #2b4c7e; font-family: monospace; font-size: 12px;'
+          );
+          return '🏴󠁧󠁢󠁳󠁣󠁴󠁿 Maslow would be proud.';
+        },
+
+        whoami: function() {
+          const username = document.getElementById('username').value.trim();
+          if (!username) {
+            console.log('%c🤷 Generate a tartan first, then ask again.', 'color: #c41e3a;');
+            return;
+          }
+          console.log('%c' +
+            '┌──────────────────────────────────┐\n' +
+            '│  CLAN REGISTRY                   │\n' +
+            '├──────────────────────────────────┤\n' +
+            '│  Developer: ' + username.padEnd(20) + ' │\n' +
+            '│  Clan:      dev-' + username.slice(0,14).padEnd(16) + ' │\n' +
+            '│  Motto:     "It works on my     │\n' +
+            '│              machine"            │\n' +
+            '│  Seat:      localhost:3000       │\n' +
+            '└──────────────────────────────────┘',
+            'color: #1a472a; font-family: monospace; font-size: 13px;'
+          );
+          return '⚔️  Clan ' + username + ' recognized.';
+        },
+
+        help: function() {
+          console.log('%c🏴󠁧󠁢󠁳󠁣󠁴󠁿 Dev Tartan Console Commands:', 'color: #8b2500; font-weight: bold; font-size: 13px;');
+          console.log('%c  devTartan.loom()              – Watch the loom weave', 'color: #3d2b1f; font-family: monospace;');
+          console.log('%c  devTartan.fortune()           – Developer fortune cookie', 'color: #3d2b1f; font-family: monospace;');
+          console.log('%c  devTartan.whoami()            – Your clan registration', 'color: #3d2b1f; font-family: monospace;');
+          console.log('%c  devTartan.hierarchyOfNeeds()  – Maslow, but for devs', 'color: #3d2b1f; font-family: monospace;');
+          console.log('%c  devTartan.help()              – This help text', 'color: #3d2b1f; font-family: monospace;');
+          return '📖 Available commands listed above.';
+        }
+      };
+    })();
   </script>
+  <!--
+       _
+      | |      "I see you scrolled all the way
+      | |       to the bottom of the source.
+      | |___    Here, have a haggis: 🫓
+      |_____|   You've earned it."
+
+      No animals were harmed in the making
+      of this tartan generator. Several
+      SHA-256 hashes were, however,
+      ruthlessly sliced into bytes.
+  -->
 </body>
 </html>
