@@ -156,6 +156,17 @@
       animation: pulse-glow 1s ease-in-out infinite;
     }
 
+    button.download-bagpipe-btn {
+      background: #4a1a5e;
+      color: #f4edd3;
+      border-color: #3d1a4a;
+      display: none;
+    }
+
+    button.download-bagpipe-btn:hover {
+      background: #6b2d8a;
+    }
+
     @keyframes pulse-glow {
       0%, 100% { box-shadow: 0 0 4px rgba(139,26,26,0.3); }
       50% { box-shadow: 0 0 12px rgba(139,26,26,0.6); }
@@ -354,6 +365,7 @@
     <button type="submit" class="generate-btn">Weave Tartan</button>
     <button type="button" class="download-btn" id="download-btn">Download SVG</button>
     <button type="button" class="bagpipe-btn" id="bagpipe-btn">🎵 Play Bagpipes</button>
+    <button type="button" class="download-bagpipe-btn" id="download-bagpipe-btn">📥 Download Tune</button>
   </form>
 
   <div class="username-label" id="username-label">The tartan of <span id="display-name"></span><img class="avatar" id="user-avatar" src="" alt="" style="display:none;"></div>
@@ -781,6 +793,7 @@
       svg.style.display = 'block';
       document.getElementById('download-btn').style.display = 'inline-block';
       document.getElementById('bagpipe-btn').style.display = 'inline-block';
+      document.getElementById('download-bagpipe-btn').style.display = 'inline-block';
       document.getElementById('username-label').style.display = 'block';
       document.getElementById('display-name').textContent = username;
 
@@ -1240,6 +1253,164 @@
       }
     }
 
+    // Render bagpipe tune offline and download as WAV
+    async function downloadBagpipes(username) {
+      const btn = document.getElementById('download-bagpipe-btn');
+      const origText = btn.textContent;
+      btn.textContent = '⏳ Rendering…';
+      btn.disabled = true;
+
+      try {
+        const hashBytes = await sha256(username.toLowerCase());
+        const melody = deriveMelody(hashBytes);
+
+        // Calculate total duration
+        let melodyDur = 1.8; // drone settle time
+        for (const note of melody) {
+          if (note.hasGrace) melodyDur += 0.035;
+          melodyDur += note.duration;
+        }
+        const totalDur = melodyDur + 2.0; // fade out + padding
+
+        const sampleRate = 44100;
+        const ctx = new OfflineAudioContext(2, Math.ceil(totalDur * sampleRate), sampleRate);
+
+        // Master chain: reverb → compressor → destination
+        const compressor = ctx.createDynamicsCompressor();
+        compressor.threshold.value = -18;
+        compressor.knee.value = 6;
+        compressor.ratio.value = 6;
+        compressor.attack.value = 0.003;
+        compressor.release.value = 0.15;
+        compressor.connect(ctx.destination);
+
+        const reverb = createReverb(ctx, compressor);
+
+        const master = ctx.createGain();
+        master.gain.value = 0.55;
+        master.connect(reverb);
+
+        const cWave = chanterWave(ctx);
+        const dWave = droneWave(ctx);
+
+        // Drones
+        const bassDrone = createDronePipe(ctx, BASS_DRONE_FREQ, master, 0.07, dWave);
+        const tenorDrone1 = createDronePipe(ctx, TENOR_DRONE_FREQ, master, 0.055, dWave);
+        const tenorDrone2 = createDronePipe(ctx, TENOR_DRONE_FREQ * 1.001, master, 0.055, dWave);
+
+        // Breath noise
+        const breathNoise = createBreathNoise(ctx, master, 0.012);
+
+        // Fade in
+        const allDrones = [bassDrone, tenorDrone1, tenorDrone2];
+        allDrones.forEach(d => {
+          const target = d.gain.gain.value;
+          d.gain.gain.setValueAtTime(0, 0);
+          d.gain.gain.linearRampToValueAtTime(target * 0.3, 0.4);
+          d.gain.gain.linearRampToValueAtTime(target, 1.5);
+        });
+        breathNoise.gain.gain.setValueAtTime(0, 0);
+        breathNoise.gain.gain.linearRampToValueAtTime(0.012, 1.0);
+
+        // Schedule melody
+        let time = 1.8;
+        for (let i = 0; i < melody.length; i++) {
+          const note = melody[i];
+          const freq = BAGPIPE_SCALE[note.noteIndex];
+          if (note.hasGrace && i > 0) {
+            const graceFreq = BAGPIPE_SCALE[note.graceNoteIndex];
+            const graceDur = scheduleGraceNote(ctx, graceFreq, time, master, cWave);
+            time += graceDur;
+          }
+          scheduleNote(ctx, freq, time, note.duration, master, cWave, 0.14);
+          time += note.duration;
+        }
+
+        // Fade out
+        const fadeStart = time + 0.3;
+        const endTime = fadeStart + 1.5;
+        allDrones.forEach(d => {
+          d.gain.gain.setValueAtTime(d.gain.gain.value, fadeStart);
+          d.gain.gain.linearRampToValueAtTime(0, endTime);
+          d.oscillators.forEach(o => o.stop(endTime + 0.1));
+        });
+        breathNoise.gain.gain.setValueAtTime(0.012, fadeStart);
+        breathNoise.gain.gain.linearRampToValueAtTime(0, endTime);
+        breathNoise.source.stop(endTime + 0.1);
+
+        // Render to buffer
+        const rendered = await ctx.startRendering();
+
+        // Encode as WAV
+        const wavBlob = audioBufferToWav(rendered);
+        const url = URL.createObjectURL(wavBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${username}-bagpipe.wav`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } finally {
+        btn.textContent = origText;
+        btn.disabled = false;
+      }
+    }
+
+    // Convert an AudioBuffer to a WAV Blob
+    function audioBufferToWav(buffer) {
+      const numChannels = buffer.numberOfChannels;
+      const sampleRate = buffer.sampleRate;
+      const format = 1; // PCM
+      const bitsPerSample = 16;
+      const channels = [];
+      for (let c = 0; c < numChannels; c++) {
+        channels.push(buffer.getChannelData(c));
+      }
+      const numFrames = buffer.length;
+      const bytesPerSample = bitsPerSample / 8;
+      const blockAlign = numChannels * bytesPerSample;
+      const dataSize = numFrames * blockAlign;
+      const headerSize = 44;
+      const arrayBuffer = new ArrayBuffer(headerSize + dataSize);
+      const view = new DataView(arrayBuffer);
+
+      // WAV header
+      writeString(view, 0, 'RIFF');
+      view.setUint32(4, headerSize - 8 + dataSize, true);
+      writeString(view, 8, 'WAVE');
+      writeString(view, 12, 'fmt ');
+      view.setUint32(16, 16, true); // subchunk1 size
+      view.setUint16(20, format, true);
+      view.setUint16(22, numChannels, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, sampleRate * blockAlign, true);
+      view.setUint16(32, blockAlign, true);
+      view.setUint16(34, bitsPerSample, true);
+      writeString(view, 36, 'data');
+      view.setUint32(40, dataSize, true);
+
+      // Interleave and write samples
+      let offset = headerSize;
+      for (let i = 0; i < numFrames; i++) {
+        for (let c = 0; c < numChannels; c++) {
+          let sample = channels[c][i];
+          sample = Math.max(-1, Math.min(1, sample));
+          sample = sample < 0 ? sample * 0x8000 : sample * 0x7FFF;
+          view.setInt16(offset, sample | 0, true);
+          offset += 2;
+        }
+      }
+
+      return new Blob([arrayBuffer], { type: 'audio/wav' });
+
+      function writeString(view, offset, str) {
+        for (let i = 0; i < str.length; i++) {
+          view.setUint8(offset + i, str.charCodeAt(i));
+        }
+      }
+    }
+
     // Event listeners
     document.getElementById('tartan-form').addEventListener('submit', (e) => {
       e.preventDefault();
@@ -1264,6 +1435,11 @@
     document.getElementById('bagpipe-btn').addEventListener('click', () => {
       const username = document.getElementById('username').value.trim().replace(/^@/, '');
       if (username) playBagpipes(username);
+    });
+
+    document.getElementById('download-bagpipe-btn').addEventListener('click', () => {
+      const username = document.getElementById('username').value.trim().replace(/^@/, '');
+      if (username) downloadBagpipes(username);
     });
 
     // Palette toggle
