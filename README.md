@@ -6,21 +6,21 @@ Dev Tartan generates a unique, deterministic tartan pattern from any GitHub user
 
 👉 **[Try it live](https://leereilly.net/dev-tartan)**
 
-![Dev Tartan](og-image.png)
+![Dev Tartan](demo.webp)
 
 ## How It Works
 
 Your GitHub username goes in. A mass of intersecting colored rectangles comes out. In between? _Math_.
 
-### Step 1: Hashing — Your Username Becomes Entropy
+### Step 1: Hashing - Your Username Becomes Entropy
 
-Your username is lowercased and fed into the [SHA-256](https://en.wikipedia.org/wiki/SHA-256) cryptographic hash function via the Web Crypto API. This produces 32 bytes (256 bits) of deterministic, uniformly distributed, avalanche-effected goodness. Change one letter in your username and the entire tartan changes. `octocat` and `octocaT`? Completely different plaids. That's the [avalanche effect](https://en.wikipedia.org/wiki/Avalanche_effect), baby.
+Your username is lowercased and fed into the [SHA-256](https://en.wikipedia.org/wiki/SHA-256) cryptographic hash function via the Web Crypto API. This produces 32 bytes (256 bits) of deterministic, uniformly distributed, avalanche-effected goodness. Change one letter in your username and the entire tartan changes. `octocat` and `Octocat`? Same tartan, since usernames are lowercased before hashing. But `octocat` and `octocot`? Completely different plaids. That's the [avalanche effect](https://en.wikipedia.org/wiki/Avalanche_effect), baby.
 
 ```
 "octocat" → SHA-256 → [0x9b, 0x2a, 0xf1, 0x73, ... 28 more bytes of chaos]
 ```
 
-### Step 2: Sett Derivation — From Bytes to Stripes
+### Step 2: Sett Derivation - From Bytes to Stripes
 
 A tartan's repeating pattern is called a **sett**. Dev Tartan derives one from the hash bytes like so:
 
@@ -32,7 +32,7 @@ A tartan's repeating pattern is called a **sett**. Dev Tartan derives one from t
 
 Duplicate colors are avoided by bumping the palette index by 7 (a prime-ish offset, because even tartans deserve a little number theory).
 
-### Step 3: Symmetry — The Mirror Trick
+### Step 3: Symmetry - The Mirror Trick
 
 Real tartans are **symmetric**: the sett plays forward and then reflects back, like a palindrome. Given stripes `[A, B, C, D]`, the full sequence becomes:
 
@@ -41,20 +41,20 @@ A  B  C  D  C  B  A  B  C  D  C  B  A  ...
 └──forward──┘  └─reverse─┘  └──forward──┘
 ```
 
-This is called **reflective symmetry** in tartan weaving. It's what gives tartans that satisfying, kaleidoscopic quality. The code does this by concatenating the sett with a reversed copy (minus the first and last elements, to avoid doubled stripes at the pivot points). If you've ever reversed a linked list in a job interview, congratulations — you were unknowingly training to weave tartan.
+This is called **reflective symmetry** in tartan weaving. It's what gives tartans that satisfying, kaleidoscopic quality. The code does this by concatenating the sett with a reversed copy (minus the first and last elements, to avoid doubled stripes at the pivot points). If you've ever reversed a linked list in a job interview, congratulations - you were unknowingly training to weave tartan.
 
-### Step 4: Rendering — Warp, Weft, and SVG Rectangles
+### Step 4: Rendering - Warp, Weft, and SVG Rectangles
 
 Real tartan is a **2/2 twill weave**: warp threads (vertical) and weft threads (horizontal) interlace at right angles. We fake this with layered SVG rectangles:
 
-1. **Background fill** — the first color of the sett floods the canvas
+1. **Background fill** - the first color of the sett floods the canvas
 2. **Warp stripes** (vertical `<rect>` elements) at 90% opacity
-3. **Weft stripes** (horizontal `<rect>` elements) at 55% opacity with `mix-blend-mode: multiply` — this simulates thread crossings where colors optically blend, just like real woven cloth
-4. **Twill texture overlay** — a tiny 4×4px repeating pattern of alternating semi-transparent light/dark squares, mimicking the diagonal twill ridges visible in real tartan fabric
+3. **Weft stripes** (horizontal `<rect>` elements) at 55% opacity with `mix-blend-mode: multiply` - this simulates thread crossings where colors optically blend, just like real woven cloth
+4. **Twill texture overlay** - a tiny 4×4px repeating pattern of alternating semi-transparent light/dark squares, mimicking the diagonal twill ridges visible in real tartan fabric
 
 The sett is scaled so roughly **3 full repeats** tile across the 500×500 SVG canvas.
 
-### Step 5: Ambiance — Background Tartanification
+### Step 5: Ambiance - Background Tartanification
 
 After rendering, a miniature version of your tartan is generated as a `data:` URI SVG tile (160×160px) with extremely low opacity (6–8%) and set as the page's repeating background. Because why stop at _one_ tartan when you can tartanify the entire viewport?
 
@@ -77,11 +77,11 @@ Twenty colors inspired by historical Scottish dye sources, from woad-adjacent na
 
 ## Features
 
-- 🔒 **Deterministic** — same username always produces the same tartan (it's a pure function of SHA-256)
-- 🎨 **Authentic-ish** — symmetric sett, twill texture, traditional color palette
-- 📥 **Downloadable** — export your tartan as SVG
-- 🔗 **Shareable** — URL query parameters (`?username=octocat`) and social sharing links
-- 🪶 **Zero dependencies** — one HTML file, no build step, no npm, no node_modules, no existential dread
+- 🔒 **Deterministic** - same username always produces the same tartan (it's a pure function of SHA-256)
+- 🎨 **Authentic-ish** - symmetric sett, twill texture, traditional color palette
+- 📥 **Downloadable** - export your tartan as SVG
+- 🔗 **Shareable** - URL query parameters (`?username=octocat`) and social sharing links
+- 🪶 **Zero dependencies** - one HTML file, no build step, no npm, no node_modules, no existential dread
 
 ## Running Locally
 
