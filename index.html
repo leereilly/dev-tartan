@@ -248,6 +248,15 @@
       font-weight: 700;
     }
 
+    .username-label .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      vertical-align: middle;
+      margin-left: 6px;
+      border: 1.5px solid #8b774b;
+    }
+
     footer {
       margin-top: auto;
       padding-top: 2rem;
@@ -277,7 +286,7 @@
     <button type="button" class="download-btn" id="download-btn">Download SVG</button>
   </form>
 
-  <div class="username-label" id="username-label">The tartan of <span id="display-name"></span></div>
+  <div class="username-label" id="username-label">The tartan of <span id="display-name"></span><img class="avatar" id="user-avatar" src="" alt="" style="display:none;"></div>
 
   <div class="tartan-container">
     <svg id="tartan-display" width="500" height="500" xmlns="http://www.w3.org/2000/svg"></svg>
@@ -548,6 +557,13 @@
       document.getElementById('download-btn').style.display = 'inline-block';
       document.getElementById('username-label').style.display = 'block';
       document.getElementById('display-name').textContent = username;
+
+      // Show user avatar
+      const avatar = document.getElementById('user-avatar');
+      avatar.src = `https://github.com/${encodeURIComponent(username)}.png?size=56`;
+      avatar.alt = username;
+      avatar.style.display = 'inline';
+      avatar.onerror = function() { this.style.display = 'none'; };
 
       displaySett(sett);
 
