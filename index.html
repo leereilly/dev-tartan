@@ -139,6 +139,28 @@
       background: #3a6b45;
     }
 
+    button.bagpipe-btn {
+      background: #5b2c6f;
+      color: #f4edd3;
+      border-color: #3d1a4a;
+      display: none;
+    }
+
+    button.bagpipe-btn:hover {
+      background: #7d3c98;
+    }
+
+    button.bagpipe-btn.playing {
+      background: #8b1a1a;
+      border-color: #6b1010;
+      animation: pulse-glow 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 4px rgba(139,26,26,0.3); }
+      50% { box-shadow: 0 0 12px rgba(139,26,26,0.6); }
+    }
+
     .share-links {
       display: none;
       gap: 0.6rem;
@@ -284,6 +306,7 @@
     <input type="text" id="username" placeholder="e.g. octocat" autocomplete="off" required>
     <button type="submit" class="generate-btn">Weave Tartan</button>
     <button type="button" class="download-btn" id="download-btn">Download SVG</button>
+    <button type="button" class="bagpipe-btn" id="bagpipe-btn">🎵 Play Bagpipes</button>
   </form>
 
   <div class="username-label" id="username-label">The tartan of <span id="display-name"></span><img class="avatar" id="user-avatar" src="" alt="" style="display:none;"></div>
@@ -642,6 +665,7 @@
 
     // Main generate handler
     async function generateTartan(username) {
+      if (bagpipePlaying) stopBagpipes();
       const hashBytes = await sha256(username.toLowerCase());
       const sett = deriveSett(hashBytes);
 
@@ -650,6 +674,7 @@
 
       svg.style.display = 'block';
       document.getElementById('download-btn').style.display = 'inline-block';
+      document.getElementById('bagpipe-btn').style.display = 'inline-block';
       document.getElementById('username-label').style.display = 'block';
       document.getElementById('display-name').textContent = username;
 
@@ -729,6 +754,385 @@
       document.body.style.backgroundSize = `${tileSize}px ${tileSize}px`;
     }
 
+    // ── Bagpipe Audio Engine (Web Audio API) ──
+    // Realistic Great Highland Bagpipe synthesis using additive harmonics,
+    // breath noise, legato chanter, grace notes, and rich multi-harmonic drones.
+
+    let bagpipeCtx = null;
+    let bagpipePlaying = false;
+    let bagpipeStopTimer = null;
+
+    // GHB chanter scale (A=480Hz concert pitch, bagpipe tuning ~475-480Hz)
+    // Low A to High A with sharped 7th (characteristic mixolydian)
+    const BAGPIPE_SCALE = [
+      480.00 * 0.5,    // Low G
+      480.00 * 9/16,   // Low A
+      480.00 * 5/8,    // B
+      480.00 * 3/4,    // C (actually C#-ish in bagpipe temperament)
+      480.00 * 3/4 * 1.04, // D
+      480.00 * 7/8,    // E
+      480.00 * 15/16,  // F (actually F#-ish)
+      480.00,          // High G
+      480.00 * 9/8,    // High A
+    ];
+
+    // Drone frequencies — Bb-based, with authentic bagpipe tuning
+    const BASS_DRONE_FREQ = 120.0;    // Bass drone ~Bb2
+    const TENOR_DRONE_FREQ = 240.0;   // Tenor drones ~Bb3
+
+    // Build a PeriodicWave for reed-like timbre (chanter)
+    // Strong odd harmonics + weaker even harmonics = nasal/reedy
+    function chanterWave(ctx) {
+      const n = 24;
+      const real = new Float32Array(n);
+      const imag = new Float32Array(n);
+      real[0] = 0;
+      imag[0] = 0;
+      for (let h = 1; h < n; h++) {
+        // Strong fundamental + odd harmonics, rolled-off even harmonics
+        const isOdd = h % 2 === 1;
+        const amp = (isOdd ? 1.0 : 0.3) / Math.pow(h, 0.75);
+        // Slight formant bump around 3rd-5th harmonic for nasal quality
+        const formant = (h >= 3 && h <= 6) ? 1.6 : 1.0;
+        imag[h] = amp * formant;
+      }
+      return ctx.createPeriodicWave(real, imag, { disableNormalization: false });
+    }
+
+    // Build a PeriodicWave for drone — rich, buzzy, warm
+    function droneWave(ctx) {
+      const n = 32;
+      const real = new Float32Array(n);
+      const imag = new Float32Array(n);
+      real[0] = 0;
+      imag[0] = 0;
+      for (let h = 1; h < n; h++) {
+        // All harmonics present, rolling off like a sawtooth but warmer
+        imag[h] = 1.0 / Math.pow(h, 0.9);
+      }
+      return ctx.createPeriodicWave(real, imag, { disableNormalization: false });
+    }
+
+    // Create filtered breath noise (constant, air-through-bag character)
+    function createBreathNoise(ctx, destination, gain) {
+      const bufferSize = ctx.sampleRate * 2;
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1);
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      noise.loop = true;
+
+      // Shape noise: bandpass to sound like air through a reed
+      const bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.value = 1200;
+      bp.Q.value = 0.8;
+
+      // Second filter for high-frequency hiss
+      const hp = ctx.createBiquadFilter();
+      hp.type = 'highpass';
+      hp.frequency.value = 2500;
+
+      const noiseGain = ctx.createGain();
+      noiseGain.gain.value = gain;
+
+      noise.connect(bp);
+      bp.connect(noiseGain);
+
+      // Also route a quieter high hiss
+      const hissGain = ctx.createGain();
+      hissGain.gain.value = gain * 0.3;
+      noise.connect(hp);
+      hp.connect(hissGain);
+      hissGain.connect(destination);
+
+      noiseGain.connect(destination);
+      noise.start();
+      return { source: noise, gain: noiseGain, hissGain };
+    }
+
+    // Create a single drone pipe with multiple detuned oscillators
+    function createDronePipe(ctx, freq, destination, gain, wave) {
+      const oscs = [];
+      // Three slightly detuned oscillators for chorus/beating
+      const detunes = [0, -4, +5]; // cents
+      const subGain = ctx.createGain();
+      subGain.gain.value = gain;
+
+      for (const det of detunes) {
+        const osc = ctx.createOscillator();
+        osc.setPeriodicWave(wave);
+        osc.frequency.value = freq;
+        osc.detune.value = det;
+        osc.connect(subGain);
+        osc.start();
+        oscs.push(osc);
+      }
+
+      // Resonant low-pass to warm the drone
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = freq * 6;
+      lp.Q.value = 0.7;
+
+      subGain.connect(lp);
+      lp.connect(destination);
+
+      return { oscillators: oscs, gain: subGain, filter: lp };
+    }
+
+    // Schedule a single chanter note (additive synthesis with the reed wave)
+    function scheduleNote(ctx, freq, startTime, duration, destination, wave, vol) {
+      // Main chanter oscillator
+      const osc1 = ctx.createOscillator();
+      osc1.setPeriodicWave(wave);
+      osc1.frequency.value = freq;
+
+      // Second oscillator slightly detuned for thickness
+      const osc2 = ctx.createOscillator();
+      osc2.setPeriodicWave(wave);
+      osc2.frequency.value = freq;
+      osc2.detune.value = 3; // 3 cents sharp
+
+      // Slow vibrato via LFO (bagpipes have subtle pitch waver from bag pressure)
+      const vibrato = ctx.createOscillator();
+      vibrato.frequency.value = 4.5; // ~4-5 Hz
+      const vibratoGain = ctx.createGain();
+      vibratoGain.gain.value = 2.5; // subtle pitch bend in cents
+      vibrato.connect(vibratoGain);
+      vibratoGain.connect(osc1.detune);
+      vibratoGain.connect(osc2.detune);
+      vibrato.start(startTime);
+      vibrato.stop(startTime + duration + 0.05);
+
+      // Formant filter chain — nasal resonance
+      const formant1 = ctx.createBiquadFilter();
+      formant1.type = 'peaking';
+      formant1.frequency.value = freq * 3;
+      formant1.gain.value = 6;
+      formant1.Q.value = 2;
+
+      const formant2 = ctx.createBiquadFilter();
+      formant2.type = 'peaking';
+      formant2.frequency.value = freq * 5;
+      formant2.gain.value = 3;
+      formant2.Q.value = 3;
+
+      // Roll off very high frequencies
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 4500;
+      lp.Q.value = 0.5;
+
+      const noteGain = ctx.createGain();
+      // Legato — no silence between notes, just quick transitions
+      noteGain.gain.setValueAtTime(0.001, startTime);
+      noteGain.gain.exponentialRampToValueAtTime(vol, startTime + 0.008);
+      noteGain.gain.setValueAtTime(vol, startTime + duration - 0.008);
+      noteGain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+      osc1.connect(formant1);
+      osc2.connect(formant1);
+      formant1.connect(formant2);
+      formant2.connect(lp);
+      lp.connect(noteGain);
+      noteGain.connect(destination);
+
+      osc1.start(startTime);
+      osc1.stop(startTime + duration + 0.01);
+      osc2.start(startTime);
+      osc2.stop(startTime + duration + 0.01);
+    }
+
+    // Schedule a very short grace note (embellishment) — characteristic of piping
+    function scheduleGraceNote(ctx, freq, startTime, destination, wave) {
+      const dur = 0.035;
+      const osc = ctx.createOscillator();
+      osc.setPeriodicWave(wave);
+      osc.frequency.value = freq;
+
+      const gn = ctx.createGain();
+      gn.gain.setValueAtTime(0.001, startTime);
+      gn.gain.exponentialRampToValueAtTime(0.10, startTime + 0.005);
+      gn.gain.exponentialRampToValueAtTime(0.001, startTime + dur);
+
+      const lp = ctx.createBiquadFilter();
+      lp.type = 'lowpass';
+      lp.frequency.value = 4000;
+
+      osc.connect(lp);
+      lp.connect(gn);
+      gn.connect(destination);
+
+      osc.start(startTime);
+      osc.stop(startTime + dur + 0.01);
+      return dur;
+    }
+
+    // Derive a melody from hash bytes
+    function deriveMelody(hashBytes) {
+      const notes = [];
+      const numNotes = 20 + (hashBytes[20] % 12); // 20-31 notes
+
+      for (let i = 0; i < numNotes; i++) {
+        const byte = hashBytes[(i + 16) % 32];
+        const noteIndex = byte % BAGPIPE_SCALE.length;
+
+        const durByte = hashBytes[(i + 17) % 32];
+        let duration;
+        if (durByte < 60) duration = 0.18;        // short
+        else if (durByte < 140) duration = 0.32;   // quaver
+        else if (durByte < 210) duration = 0.48;   // crotchet
+        else duration = 0.7;                        // minim
+
+        // Determine if a grace note precedes this note (very common in piping)
+        const graceFlag = hashBytes[(i + 3) % 32];
+        const hasGrace = graceFlag > 80; // ~70% of notes get grace notes
+        // Grace note pitch: high A or high G (common embellishments)
+        const graceNoteIndex = (graceFlag % 2 === 0) ? 8 : 7; // High A or High G
+
+        notes.push({ noteIndex, duration, hasGrace, graceNoteIndex });
+      }
+      return notes;
+    }
+
+    // Simple delay-based reverb for room ambience
+    function createReverb(ctx, destination) {
+      const delays = [0.03, 0.07, 0.11, 0.17];
+      const gains = [0.15, 0.10, 0.07, 0.04];
+      const input = ctx.createGain();
+      input.gain.value = 1.0;
+
+      // Dry path
+      input.connect(destination);
+
+      // Wet paths (multiple delays)
+      for (let i = 0; i < delays.length; i++) {
+        const delay = ctx.createDelay(0.3);
+        delay.delayTime.value = delays[i];
+        const g = ctx.createGain();
+        g.gain.value = gains[i];
+        const lp = ctx.createBiquadFilter();
+        lp.type = 'lowpass';
+        lp.frequency.value = 2000 - i * 300;
+        input.connect(delay);
+        delay.connect(lp);
+        lp.connect(g);
+        g.connect(destination);
+      }
+      return input;
+    }
+
+    async function playBagpipes(username) {
+      if (bagpipePlaying) {
+        stopBagpipes();
+        return;
+      }
+
+      const hashBytes = await sha256(username.toLowerCase());
+      const melody = deriveMelody(hashBytes);
+
+      bagpipeCtx = new (window.AudioContext || window.webkitAudioContext)();
+      bagpipePlaying = true;
+
+      const btn = document.getElementById('bagpipe-btn');
+      btn.textContent = '⏹ Stop Bagpipes';
+      btn.classList.add('playing');
+
+      const ctx = bagpipeCtx;
+
+      // Master chain: reverb → compressor → destination
+      const compressor = ctx.createDynamicsCompressor();
+      compressor.threshold.value = -18;
+      compressor.knee.value = 6;
+      compressor.ratio.value = 6;
+      compressor.attack.value = 0.003;
+      compressor.release.value = 0.15;
+      compressor.connect(ctx.destination);
+
+      const reverb = createReverb(ctx, compressor);
+
+      const master = ctx.createGain();
+      master.gain.value = 0.55;
+      master.connect(reverb);
+
+      // Build waveforms
+      const cWave = chanterWave(ctx);
+      const dWave = droneWave(ctx);
+
+      // ── Drones ──
+      const bassDrone = createDronePipe(ctx, BASS_DRONE_FREQ, master, 0.07, dWave);
+      const tenorDrone1 = createDronePipe(ctx, TENOR_DRONE_FREQ, master, 0.055, dWave);
+      const tenorDrone2 = createDronePipe(ctx, TENOR_DRONE_FREQ * 1.001, master, 0.055, dWave);
+
+      // ── Breath noise ──
+      const breathNoise = createBreathNoise(ctx, master, 0.012);
+
+      // Fade everything in over 1.5s (bag filling up, drones starting)
+      const allDrones = [bassDrone, tenorDrone1, tenorDrone2];
+      allDrones.forEach(d => {
+        const target = d.gain.gain.value;
+        d.gain.gain.setValueAtTime(0, ctx.currentTime);
+        d.gain.gain.linearRampToValueAtTime(target * 0.3, ctx.currentTime + 0.4);
+        d.gain.gain.linearRampToValueAtTime(target, ctx.currentTime + 1.5);
+      });
+      breathNoise.gain.gain.setValueAtTime(0, ctx.currentTime);
+      breathNoise.gain.gain.linearRampToValueAtTime(0.012, ctx.currentTime + 1.0);
+
+      // ── Schedule chanter melody ──
+      let time = ctx.currentTime + 1.8; // drones settle first
+
+      for (let i = 0; i < melody.length; i++) {
+        const note = melody[i];
+        const freq = BAGPIPE_SCALE[note.noteIndex];
+
+        // Grace note embellishment
+        if (note.hasGrace && i > 0) {
+          const graceFreq = BAGPIPE_SCALE[note.graceNoteIndex];
+          const graceDur = scheduleGraceNote(ctx, graceFreq, time, master, cWave);
+          time += graceDur;
+        }
+
+        // Main note — legato, no gap
+        scheduleNote(ctx, freq, time, note.duration, master, cWave, 0.14);
+        time += note.duration;
+      }
+
+      // Fade drones out after melody
+      const fadeStart = time + 0.3;
+      const endTime = fadeStart + 1.5;
+      allDrones.forEach(d => {
+        d.gain.gain.setValueAtTime(d.gain.gain.value, fadeStart);
+        d.gain.gain.linearRampToValueAtTime(0, endTime);
+        d.oscillators.forEach(o => o.stop(endTime + 0.1));
+      });
+      breathNoise.gain.gain.setValueAtTime(0.012, fadeStart);
+      breathNoise.gain.gain.linearRampToValueAtTime(0, endTime);
+      breathNoise.source.stop(endTime + 0.1);
+
+      // Auto-stop
+      const totalMs = (endTime - ctx.currentTime + 0.3) * 1000;
+      bagpipeStopTimer = setTimeout(() => {
+        if (bagpipePlaying) stopBagpipes();
+      }, totalMs);
+    }
+
+    function stopBagpipes() {
+      bagpipePlaying = false;
+      if (bagpipeStopTimer) { clearTimeout(bagpipeStopTimer); bagpipeStopTimer = null; }
+      const btn = document.getElementById('bagpipe-btn');
+      btn.textContent = '🎵 Play Bagpipes';
+      btn.classList.remove('playing');
+
+      if (bagpipeCtx) {
+        bagpipeCtx.close().catch(() => {});
+        bagpipeCtx = null;
+      }
+    }
+
     // Event listeners
     document.getElementById('tartan-form').addEventListener('submit', (e) => {
       e.preventDefault();
@@ -744,6 +1148,11 @@
     });
 
     document.getElementById('download-btn').addEventListener('click', downloadSVG);
+
+    document.getElementById('bagpipe-btn').addEventListener('click', () => {
+      const username = document.getElementById('username').value.trim().replace(/^@/, '');
+      if (username) playBagpipes(username);
+    });
 
     // Generate from ?username= query parameter or #hash on page load
     (function autoGenerate() {

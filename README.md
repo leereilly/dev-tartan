@@ -84,6 +84,7 @@ Twenty colors inspired by historical Scottish dye sources, from woad-adjacent na
 - 📥 **Downloadable** - export your tartan as SVG
 - 🔗 **Shareable** - URL query parameters (`?username=octocat`) and social sharing links
 - 🪶 **Zero dependencies** - one HTML file, no build step, no npm, no node_modules, no existential dread
+- 🎵 **No bagpipes** - we considered auto-playing _Scotland the Brave_ on page load, but decided some traditions are best left in the Highlands
 
 ## Running Locally
 
