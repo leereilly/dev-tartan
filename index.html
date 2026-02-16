@@ -950,24 +950,89 @@
       buckle.setAttribute('stroke-width', '0.5');
       svg.appendChild(buckle);
 
-      // Torso / shirt
+      // Torso / shirt (black t-shirt)
       const torso = document.createElementNS(ns, 'path');
       torso.setAttribute('d', 'M72,105 L65,175 L155,175 L148,105 Q130,95 110,95 Q90,95 72,105 Z');
-      torso.setAttribute('fill', '#f0e8d0');
-      torso.setAttribute('stroke', '#c4b48a');
+      torso.setAttribute('fill', '#1a1a1a');
+      torso.setAttribute('stroke', '#333333');
       torso.setAttribute('stroke-width', '1.5');
       svg.appendChild(torso);
 
-      // Shirt collar lines
+      // GitHub Metal logo on shirt
+      const logoG = document.createElementNS(ns, 'g');
+      logoG.setAttribute('transform', 'translate(88, 115)');
+
+      // Orange ring
+      const ring = document.createElementNS(ns, 'circle');
+      ring.setAttribute('cx', 22); ring.setAttribute('cy', 20);
+      ring.setAttribute('r', 18);
+      ring.setAttribute('fill', 'none');
+      ring.setAttribute('stroke', '#d4881f');
+      ring.setAttribute('stroke-width', '3');
+      logoG.appendChild(ring);
+
+      // Crossed swords behind the ring
+      const sword1 = document.createElementNS(ns, 'line');
+      sword1.setAttribute('x1', 2); sword1.setAttribute('y1', 0);
+      sword1.setAttribute('x2', 42); sword1.setAttribute('y2', 40);
+      sword1.setAttribute('stroke', '#8a8a8a');
+      sword1.setAttribute('stroke-width', '2');
+      sword1.setAttribute('stroke-linecap', 'round');
+      logoG.appendChild(sword1);
+
+      const sword2 = document.createElementNS(ns, 'line');
+      sword2.setAttribute('x1', 42); sword2.setAttribute('y1', 0);
+      sword2.setAttribute('x2', 2); sword2.setAttribute('y2', 40);
+      sword2.setAttribute('stroke', '#8a8a8a');
+      sword2.setAttribute('stroke-width', '2');
+      sword2.setAttribute('stroke-linecap', 'round');
+      logoG.appendChild(sword2);
+
+      // Sword hilts (small crossbars)
+      [[4, 3], [40, 3], [4, 37], [40, 37]].forEach(([hx, hy]) => {
+        const hilt = document.createElementNS(ns, 'line');
+        hilt.setAttribute('x1', hx - 3); hilt.setAttribute('y1', hy);
+        hilt.setAttribute('x2', hx + 3); hilt.setAttribute('y2', hy);
+        hilt.setAttribute('stroke', '#c4956a');
+        hilt.setAttribute('stroke-width', '2');
+        hilt.setAttribute('stroke-linecap', 'round');
+        logoG.appendChild(hilt);
+      });
+
+      // "GH" text in metal style
+      const ghText = document.createElementNS(ns, 'text');
+      ghText.setAttribute('x', 22); ghText.setAttribute('y', 25);
+      ghText.setAttribute('text-anchor', 'middle');
+      ghText.setAttribute('font-family', 'Impact, Arial Black, sans-serif');
+      ghText.setAttribute('font-size', '14');
+      ghText.setAttribute('font-weight', 'bold');
+      ghText.setAttribute('fill', '#cc1100');
+      ghText.setAttribute('stroke', '#880000');
+      ghText.setAttribute('stroke-width', '0.5');
+      ghText.textContent = 'GH';
+      logoG.appendChild(ghText);
+
+      // Inner pentagram hint (small inverted V)
+      const penta = document.createElementNS(ns, 'path');
+      penta.setAttribute('d', 'M18,10 L22,30 L26,10');
+      penta.setAttribute('fill', 'none');
+      penta.setAttribute('stroke', '#666');
+      penta.setAttribute('stroke-width', '1');
+      penta.setAttribute('opacity', '0.5');
+      logoG.appendChild(penta);
+
+      svg.appendChild(logoG);
+
+      // Shirt collar lines (dark for black t-shirt)
       const collarL = document.createElementNS(ns, 'line');
       collarL.setAttribute('x1', 100); collarL.setAttribute('y1', 97);
       collarL.setAttribute('x2', 95); collarL.setAttribute('y2', 120);
-      collarL.setAttribute('stroke', '#c4b48a'); collarL.setAttribute('stroke-width', '1');
+      collarL.setAttribute('stroke', '#333333'); collarL.setAttribute('stroke-width', '1');
       svg.appendChild(collarL);
       const collarR = document.createElementNS(ns, 'line');
       collarR.setAttribute('x1', 120); collarR.setAttribute('y1', 97);
       collarR.setAttribute('x2', 125); collarR.setAttribute('y2', 120);
-      collarR.setAttribute('stroke', '#c4b48a'); collarR.setAttribute('stroke-width', '1');
+      collarR.setAttribute('stroke', '#333333'); collarR.setAttribute('stroke-width', '1');
       svg.appendChild(collarR);
 
       // Arms
