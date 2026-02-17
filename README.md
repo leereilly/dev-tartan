@@ -77,6 +77,55 @@ Twenty colors inspired by historical Scottish dye sources, from woad-adjacent na
 | Black | `#1a1a1a` | | Charcoal | `#3d3d3d` |
 | Ivory | `#f0e8d0` | | Grey | `#7a7a7a` |
 
+## Named Clan Tartans
+
+If your GitHub username matches a real Scottish clan name, Dev Tartan will render the **authentic clan tartan** instead of a generated one. Sett definitions (the thread-color-and-count sequences that define each pattern) were sourced from public-domain tartan registries, principally the [Scottish Register of Tartans](https://www.tartanregister.gov.uk/) and cross-referenced with the [Scottish Tartans Authority](https://www.tartansauthority.com/). Each sett is encoded as a compact string of color codes and thread counts (e.g. `R 72 B 8 BK 12 Y 2`) using the standard tartan weaving abbreviations:
+
+| Code | Color | Code | Color |
+|------|-------|------|-------|
+| BK | Black | AZ | Azure |
+| B | Blue | CR | Crimson |
+| G | Green | PU | Purple |
+| R | Red | GY | Grey |
+| Y | Yellow | BR | Brown |
+| W | White | LG | Light Green |
+| DB | Dark Blue | Or | Orange |
+| Mn | Maroon | | |
+
+The lookup is case-insensitive and supports common alternate spellings — `Mc` prefixes resolve to `Mac` (e.g. `McGregor` → MacGregor), `Stuart` resolves to Stewart Royal, `Ogilvie` to Ogilvy, and so on.
+
+The following 106 clan and district tartans are included:
+
+| | | | |
+|---|---|---|---|
+| Abercrombie | Anderson | Armstrong | Baird |
+| Barclay | Black Watch | Boyd | Brodie |
+| Bruce | Buchanan | Cameron | Campbell |
+| Carnegie | Chisholm | Clark | Cochrane |
+| Colquhoun | Crawford | Cunningham | Davidson |
+| Douglas | Drummond | Duncan | Dundas |
+| Elliott | Erskine | Farquharson | Ferguson |
+| Fletcher | Forbes | Fraser | Gordon |
+| Gow | Graham | Grant | Gunn |
+| Hamilton | Hay | Henderson | Home |
+| Hunter | Innes | Johnston | Keith |
+| Kennedy | Kerr | Lamont | Leslie |
+| Lindsay | Livingston | Logan | MacAlister |
+| MacArthur | MacAulay | MacCallum | MacDonald |
+| MacDougall | MacDuff | MacEwan | MacFarlane |
+| MacGregor | MacInnes | MacIntyre | MacKay |
+| MacKenzie | MacKinnon | MacKintosh | MacLachlan |
+| MacLaren | MacLean | MacLeod | MacMillan |
+| MacNab | MacNeil | MacPherson | MacQuarrie |
+| MacRae | MacTavish | Malcolm | Matheson |
+| Maxwell | Menzies | Mitchell | Montgomery |
+| Morrison | Munro | Murray | Napier |
+| Ogilvy | Oliphant | Ramsay | Rob Roy |
+| Robertson | Rose | Ross | Scott |
+| Shaw | Sinclair | Skene | Stewart Royal |
+| Stewart Hunting | Stewart Dress | Sutherland | Urquhart |
+| Wallace | Wemyss | | |
+
 ## Features
 
 - 🔒 **Deterministic** - same username always produces the same tartan (it's a pure function of SHA-256)
