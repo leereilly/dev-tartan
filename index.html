@@ -672,6 +672,190 @@
     let currentPalette = 'traditional';
     let TARTAN_PALETTE = PALETTES.traditional;
 
+    // ── Real clan tartan sett definitions ──────────────────────────
+    // Traditional hex colours for tartan weaving
+    const TARTAN_COLORS = {
+      BK: { name: 'Black',       hex: '#101010' },
+      B:  { name: 'Blue',        hex: '#003366' },
+      G:  { name: 'Green',       hex: '#006400' },
+      R:  { name: 'Red',         hex: '#c80000' },
+      Y:  { name: 'Yellow',      hex: '#ffd700' },
+      W:  { name: 'White',       hex: '#ffffff' },
+      AZ: { name: 'Azure',       hex: '#5b97b0' },
+      CR: { name: 'Crimson',     hex: '#dc143c' },
+      PU: { name: 'Purple',      hex: '#6a2c8b' },
+      GY: { name: 'Grey',        hex: '#808080' },
+      BR: { name: 'Brown',       hex: '#6b3a2a' },
+      LG: { name: 'Light Green', hex: '#86c67c' },
+      Or: { name: 'Orange',      hex: '#ec8048' },
+      Mn: { name: 'Maroon',      hex: '#800020' },
+      DB: { name: 'Dark Blue',   hex: '#00008c' },
+    };
+
+    // Parse a sett string like "R 72 B 8 BK 12 Y 2" into [{color, width}, ...]
+    function parseSett(settStr) {
+      const tokens = settStr.trim().split(/\s+/);
+      const sett = [];
+      for (let i = 0; i < tokens.length - 1; i += 2) {
+        const colorCode = tokens[i];
+        const width = parseInt(tokens[i + 1], 10);
+        const color = TARTAN_COLORS[colorCode];
+        if (color && !isNaN(width)) {
+          // Scale down large thread counts for better display
+          sett.push({ color, width: Math.max(2, Math.round(width / 2)) });
+        }
+      }
+      return sett;
+    }
+
+    // Clan tartan definitions — sett strings from public-domain sources
+    // Each entry: [display name, sett string, optional aliases]
+    const CLAN_TARTAN_DEFS = [
+      ['Abercrombie',       'G 28 W 2 G 14 BK 14 B 4 BK 4 B 4 BK 4 B 14'],
+      ['Anderson',          'R 6 AZ 12 R 2 BK 4 R 2 AZ 36 BK 6 W 6 BK 6 Y 2 BK 2 Y 2 BK 8 R 2 B 8 R 6 G 12 R 4 G 12 R 8'],
+      ['Armstrong',         'G 4 BK 2 G 60 BK 24 B 4 BK 2 B 2 BK 2 B 24 R 6'],
+      ['Baird',             'PU 6 G 2 PU 2 G 16 BK 16 B 16 BK 4 B 6'],
+      ['Barclay',           'R 2 G 32 B 32 G 2'],
+      ['Black Watch',       'B 22 BK 2 B 2 BK 2 B 2 BK 16 G 16 BK 2 G 16 BK 16 B 16 BK 2 B 2 G 10 BK 2 G 10 BK 8 DB 9 BK 1 DB 1'],
+      ['Boyd',              'Y 10 G 44 BK 4 B 4 BK 4 B 4 BK 20 R 76 G 10 R 8 BK 8 W 10'],
+      ['Brodie',            'R 96 W 8 B 8 BK 8 R 24 B 8 R 2 Y 8'],
+      ['Bruce',             'W 2 R 16 G 4 R 4 G 12 R 2 G 12 R 4 G 4 R 16 Y 2'],
+      ['Buchanan',          'BK 2 Y 12 BK 2 B 8 BK 2 G 12 B 8 G 12 BK 2 B 8 BK 2 R 16 W 2 R 16 BK 2 B 8 BK 2 Y 12'],
+      ['Cameron',           'Y 2 R 32 G 12 R 4 G 12 R 4'],
+      ['Campbell',          'B 22 BK 2 B 2 BK 2 B 2 BK 16 G 16 BK 2 G 16 BK 16 B 16 BK 2 B 2'],
+      ['Carnegie',          'Y 2 G 4 R 2 G 2 R 4 G 12 BK 12 R 2 B 12 R 4 B 2 R 2 B 6'],
+      ['Chisholm',          'R 24 PU 4 W 2 PU 4 R 6 G 16 R 6 PU 2'],
+      ['Clark',             'AZ 24 BK 8 G 8 BK 8 R 24'],
+      ['Cochrane',          'G 32 R 4 G 4 R 2 G 6 R 2 G 4 R 4 G 24 BK 24 R 2 B 32 R 4 B 16 Y 4'],
+      ['Colquhoun',         'B 2 BK 2 B 16 BK 16 W 2 G 16 R 4'],
+      ['Crawford',          'CR 12 W 4 CR 60 G 24 CR 6 G 24 CR 6'],
+      ['Cunningham',        'W 6 R 2 B 2 R 56 BK 60 R 2 BK 6'],
+      ['Davidson',          'R 2 B 12 G 2 B 2 G 16 BK 2 G 16 BK 2 G 2 BK 12 R 2'],
+      ['Douglas',           'BK 4 AZ 4 G 16 B 16 W 2'],
+      ['Drummond',          'R 72 W 2 B 6 Y 2 G 32 R 16 B 6 AZ 4 W 2'],
+      ['Duncan',            'BK 8 G 42 W 6 G 42 B 42 R 8'],
+      ['Dundas',            'BK 4 G 4 R 2 G 48 BK 24 B 32 BK 8'],
+      ['Elliott',           'R 2 B 6 BR 8 B 32'],
+      ['Erskine',           'R 8 G 2 R 56 G 48 R 2 G 12'],
+      ['Farquharson',       'R 4 B 8 BK 2 B 2 BK 2 B 2 BK 16 G 16 Y 4 G 16 BK 16 B 16 BK 2 R 4'],
+      ['Ferguson',          'B 48 BK 16 G 16 R 4 G 16 BK 2 W 4'],
+      ['Fletcher',          'B 12 BK 2 B 12 BK 16 R 2 G 16 BK 4'],
+      ['Forbes',            'B 16 BK 2 B 4 BK 2 B 4 BK 12 G 16 BK 2 W 4 BK 2 G 16 BK 12 B 16 BK 2 B 4'],
+      ['Fraser',            'B 32 R 2 B 2 R 2 G 24 R 32 G 4 R 32 G 24 B 24 R 2 B 2'],
+      ['Gordon',            'B 24 BK 4 B 4 BK 4 B 4 BK 24 G 24 Y 4 G 24 BK 24 B 22 BK 4 B 4'],
+      ['Gow',               'R 8 G 8 R 2 B 8 R 8'],
+      ['Graham',            'BK 2 B 24 BK 24 G 2 AZ 4 G 32'],
+      ['Grant',             'R 12 B 2 R 4 B 4 R 64 AZ 2 R 4 B 16 R 4 G 4 R 4 G 48 R 4 B 4 R 12'],
+      ['Gunn',              'R 4 G 24 BK 24 G 2 B 24 G 4'],
+      ['Hamilton',          'W 2 R 18 B 12 R 2 B 12'],
+      ['Hay',               'W 12 R 4 BK 2 R 4 G 8 R 96 G 24 R 4 G 4 R 4 G 72 Y 4 G 8 R 12'],
+      ['Henderson',         'Y 2 BK 12 G 8 BK 2 G 32 B 2 G 8 B 12 W 2'],
+      ['Home',              'B 6 G 4 B 48 BK 16 R 2 BK 4 R 2 BK 56'],
+      ['Hunter',            'G 16 BK 2 G 16 BK 16 R 2 B 16 W 2 B 16 R 2 BK 16'],
+      ['Innes',             'AZ 14 BK 48 R 8 BK 8 R 8 BK 8 R 48 Y 8 R 12 B 24 R 12 BK 8 G 40 BK 8 R 12 W 8'],
+      ['Johnston',          'Y 6 G 4 BK 2 G 60 B 48 BK 4 B 4 BK 4'],
+      ['Keith',             'BK 4 G 18 B 8 BK 8 B 8'],
+      ['Kennedy',           'R 4 G 48 B 8 BK 6 B 6 BK 6 B 6 BK 6 B 8 G 24 CR 2 G 4 CR 2 G 6 Y 2 G 4 BK 4'],
+      ['Kerr',              'BK 8 R 4 BK 2 R 56 BK 28 G 6 BK 2 G 4 BK 2 G 40'],
+      ['Lamont',            'B 6 BK 2 B 2 BK 2 B 2 BK 8 G 8 W 2 G 8 BK 8 B 8 BK 2 B 2'],
+      ['Leslie',            'BK 2 R 64 B 32 R 8 BK 12 Y 2 BK 12 R 8'],
+      ['Lindsay',           'CR 6 B 4 CR 48 B 16 G 4 B 4 G 4 B 4 G 40'],
+      ['Livingston',        'R 16 G 4 R 40 G 32 R 8 BK 2 R 4 BK 2 R 8 G 24'],
+      ['Logan',             'Y 4 BK 2 R 2 G 32 BK 24 B 32 R 4 B 4 R 4 B 6 R 12'],
+      ['MacAlister',        'R 8 AZ 2 R 2 G 12 R 24 AZ 2 R 2 G 36 R 2 AZ 2 R 64 AZ 2 R 2 G 36 R 2 AZ 2 R 24 B 16 R 16 G 16 R 8 G 16 R 64'],
+      ['MacArthur',         'Y 6 G 60 BK 24 G 12 BK 64'],
+      ['MacAulay',          'BK 4 R 32 G 12 R 6 G 16 W 2'],
+      ['MacCallum',         'BK 2 B 12 BK 12 G 8 AZ 2 BK 4 G 16'],
+      ['MacDonald',         'G 16 R 2 G 4 R 6 G 24 BK 24 R 2 B 24 R 6 B 4 R 2 B 16'],
+      ['MacDougall',        'PU 8 G 16 B 12 PU 16 R 12 G 4 R 4 G 4 R 48 G 2 R 6'],
+      ['MacDuff',           'R 8 BK 2 R 8 G 12 BK 8 B 6 R 16'],
+      ['MacEwan',           'Y 4 BK 2 G 24 BK 24 B 24 BK 2 B 4 BK 2 B 24 BK 24 G 24 BK 2 R 4'],
+      ['MacFarlane',        'R 84 BK 2 G 24 W 4 R 6 BK 2 R 6 W 4 G 4 PU 24 BK 8 R 6 W 8 G 6'],
+      ['MacGregor',         'R 72 G 36 R 8 G 12 BK 2 W 4'],
+      ['MacInnes',          'Y 4 BK 24 G 4 BK 4 G 4 BK 4 G 32 BK 6 AZ 6 BK 6 B 24 G 12 R 4'],
+      ['MacIntyre',         'AZ 2 R 4 G 4 R 8 B 32 R 4 G 2 R 8 B 2 R 4 G 32 R 8 B 4 R 4 AZ 2'],
+      ['MacKay',            'BK 6 G 28 BK 28 G 4 B 28 G 6'],
+      ['MacKenzie',         'B 24 BK 4 B 4 BK 4 B 4 BK 24 G 24 BK 2 W 4 BK 2 G 24 BK 24 B 24 BK 2 R 4'],
+      ['MacKinnon',         'W 4 R 8 PU 4 G 16 R 32 G 4 B 8 R 4 G 32 R 12 B 4 G 4 R 6 PU 4'],
+      ['MacKintosh',        'R 48 B 12 R 6 G 24 R 8 B 2'],
+      ['MacLachlan',        'R 32 BK 4 R 4 BK 4 R 4 BK 32 B 32 G 6 B 32 BK 32 R 32 BK 4 R 4'],
+      ['MacLaren',          'B 48 BK 16 G 16 R 4 G 16 BK 2 Y 4'],
+      ['MacLean',           'BK 2 R 4 AZ 2 R 24 G 16 BK 2 W 2 BK 2 Y 2 BK 6 AZ 2 B 8'],
+      ['MacLeod',           'R 6 BK 4 G 30 BK 20 B 40 BK 4 Y 4'],
+      ['MacMillan',         'R 2 Y 16 R 4 Y 16 R 6 Y 4 R 24 Y 2 R 6'],
+      ['MacNab',            'G 16 CR 2 G 2 CR 2 G 2 CR 12 R 16 CR 2 R 16 CR 12 G 14 CR 2 G 2'],
+      ['MacNeil',           'Y 2 BK 6 G 30 BK 28 B 32 R 4 W 2'],
+      ['MacPherson',        'R 2 BK 2 W 2 R 24 AZ 8 BK 2 AZ 2 BK 2 AZ 8 BK 12 Y 2 G 16 R 24 AZ 4 R 24'],
+      ['MacQuarrie',        'R 4 AZ 2 R 32 B 24 R 8 G 32 R 12'],
+      ['MacRae',            'G 8 R 2 G 8 R 8 B 2 R 2 B 2 R 2 B 2 R 8 B 2 R 2 B 2 R 2 B 2 R 8 W 2 R 2 B 8 R 2 B 8 R 2 W 2 R 8 G 2 R 2 G 2 R 8 G 8 R 2 G 8'],
+      ['MacTavish',         'AZ 4 R 24 B 4 AZ 12 BK 12 AZ 2'],
+      ['Malcolm',           'B 2 R 2 B 12 BK 12 G 12 BK 2 Y 2 BK 2 AZ 2 BK 2 G 12 BK 12 B 12 R 2'],
+      ['Matheson',          'R 4 G 4 R 24 B 20 AZ 6 G 20 R 4 G 4 R 4 G 20 R 24 G 4 R 4'],
+      ['Maxwell',           'R 6 G 2 R 56 BK 12 R 8 G 32 R 6'],
+      ['Menzies',           'R 10 AZ 4 W 2 G 10 R 10'],
+      ['Mitchell',          'BK 4 G 24 BK 24 R 2 B 24 W 4'],
+      ['Montgomery',        'BK 8 G 10 BK 8 PU 56 BK 8 R 10 BK 8'],
+      ['Morrison',          'BK 6 G 28 BK 28 G 4 B 28 R 6'],
+      ['Munro',             'G 4 CR 4 G 4 R 32 B 2 Y 2 R 6 B 12 R 6 Y 2 B 2 R 6 G 32 R 6 B 2 Y 2 R 48'],
+      ['Murray',            'B 12 BK 2 B 2 BK 2 B 2 BK 12 G 12 R 4 G 12 BK 12 B 12 BK 2 B 4'],
+      ['Napier',            'W 2 B 24 BK 8 W 4 BK 4 W 8 BK 4 W 4 BK 4 W 4 BK 8'],
+      ['Ogilvy',            'W 4 AZ 10 Y 4 PU 4 R 12 W 4 R 12 W 4 R 12 BK 4 Y 10 AZ 20 R 6 AZ 20'],
+      ['Oliphant',          'G 4 W 2 G 64 B 48 BK 8 B 8'],
+      ['Ramsay',            'R 6 PU 2 R 60 BK 56 W 4 BK 8'],
+      ['Rob Roy',           'BK 8 R 8'],
+      ['Robertson',         'R 2 G 2 R 18 B 2 R 2 G 18 R 2 B 18 R 2 G 2 R 18 G 2 R 2'],
+      ['Rose',              'G 4 R 56 B 12 R 10 B 4 R 4 B 4 R 22 W 4'],
+      ['Ross',              'G 36 R 4 G 36 R 36 G 4 R 8 G 4 R 36 B 36 R 4 B 36 R 36 B 2 R 2 B 4 R 2 B 2 R 36 B 2 R 2 B 4 R 2 B 2 R 36 G 36 R 4 G 36'],
+      ['Scott',             'G 8 R 6 BK 2 R 56 G 28 R 8 G 8 W 6 G 8 R 8'],
+      ['Shaw',              'AZ 10 BK 2 R 60 PU 30 R 16 G 60 R 16 PU 4'],
+      ['Sinclair',          'R 60 G 24 BK 10 W 4 AZ 12 R 60'],
+      ['Skene',             'B 2 R 6 G 18 R 6 B 2 R 6 B 18'],
+      ['Stewart Royal',     'R 72 B 8 BK 12 Y 2 BK 2 W 2 BK 2 G 16 R 8 BK 2 R 4 W 2'],
+      ['Stewart Hunting',   'G 4 B 14 BK 2 B 2 BK 2 B 2 BK 6 G 22 R 4 G 22 BK 6 G 4 BK 12 G 4 BK 12 G 4 BK 6 G 22 Y 4 G 22 BK 6 B 2 BK 2 B 2 BK 2 B 14 G 4'],
+      ['Stewart Dress',     'W 72 B 8 BK 12 Y 2 BK 2 W 2 BK 2 G 16 R 8 BK 2 R 4 W 2'],
+      ['Sutherland',        'G 12 W 4 G 48 BK 24 B 6 BK 4 B 4 BK 4 B 24 R 2 B 2 R 6'],
+      ['Urquhart',          'R 4 G 6 BK 6 G 96 BK 48 B 16 BK 6 B 6 BK 6 B 48 W 4 B 8'],
+      ['Wallace',           'BK 2 R 16 BK 16 Y 2'],
+      ['Wemyss',            'R 8 G 2 R 48 BK 8 R 8 BK 24 W 2 BK 24 R 8'],
+    ];
+
+    // Build lookup map: lowercase name → { displayName, sett }
+    // Also index common alternate spellings (e.g. "stuart" → Stewart Royal)
+    const CLAN_TARTANS = {};
+    const CLAN_ALIASES = {
+      'stuart': 'stewart royal', 'stewart': 'stewart royal',
+      'macdonell': 'macdonald', 'mcdonald': 'macdonald', 'mcdonell': 'macdonald',
+      'mcgregor': 'macgregor', 'mcleod': 'macleod', 'mckay': 'mackay',
+      'mckenzie': 'mackenzie', 'mckinnon': 'mackinnon', 'mckintosh': 'mackintosh',
+      'mclean': 'maclean', 'mclaren': 'maclaren', 'mclachlan': 'maclachlan',
+      'mcmillan': 'macmillan', 'mcneil': 'macneil', 'mcnab': 'macnab',
+      'mcpherson': 'macpherson', 'mcrae': 'macrae', 'mcintyre': 'macintyre',
+      'mcarthur': 'macarthur', 'mcaulay': 'macaulay', 'mcewan': 'macewan',
+      'mcfarlane': 'macfarlane', 'mctavish': 'mactavish', 'mcinnes': 'macinnes',
+      'mccallum': 'maccallum', 'mcdougall': 'macdougall', 'mcduff': 'macduff',
+      'mcquarrie': 'macquarrie', 'mcalister': 'macalister', 'mcmalcolm': 'malcolm',
+      'fergusson': 'ferguson', 'johnstone': 'johnston', 'livingstone': 'livingston',
+      'ogilvie': 'ogilvy', 'blackwatch': 'black watch',
+      'robroy': 'rob roy', 'rob_roy': 'rob roy',
+    };
+    CLAN_TARTAN_DEFS.forEach(([name, settStr]) => {
+      CLAN_TARTANS[name.toLowerCase()] = { displayName: name, sett: parseSett(settStr) };
+    });
+
+    // Look up a clan tartan by name (returns { displayName, sett } or null)
+    function lookupClanTartan(name) {
+      const key = name.toLowerCase().trim();
+      if (CLAN_TARTANS[key]) return CLAN_TARTANS[key];
+      const aliased = CLAN_ALIASES[key];
+      if (aliased && CLAN_TARTANS[aliased]) return CLAN_TARTANS[aliased];
+      // Try with "mac" prefix for "mc" names not explicitly aliased
+      if (key.startsWith('mc') && !key.startsWith('mac')) {
+        const macKey = 'mac' + key.slice(2);
+        if (CLAN_TARTANS[macKey]) return CLAN_TARTANS[macKey];
+      }
+      return null;
+    }
+
     // Hash a string to SHA-256 and return byte array
     async function sha256(str) {
       const data = new TextEncoder().encode(str);
@@ -1356,24 +1540,49 @@
       genBtn.textContent = 'Weaving…';
       genBtn.disabled = true;
 
-      const hashBytes = await sha256(username.toLowerCase());
-      const sett = deriveSett(hashBytes);
+      // Check if this is a real clan name with a traditional tartan
+      const clanMatch = lookupClanTartan(username);
+      let sett, hashBytes;
+
+      if (clanMatch) {
+        // Use the authentic clan tartan sett
+        sett = clanMatch.sett;
+        hashBytes = await sha256(username.toLowerCase());
+      } else {
+        // Generate from SHA-256 hash as usual
+        hashBytes = await sha256(username.toLowerCase());
+        sett = deriveSett(hashBytes);
+      }
 
       const svg = document.getElementById('tartan-display');
       renderTartan(svg, sett);
 
       svg.style.display = 'block';
-      svg.setAttribute('aria-label', `Generated tartan pattern for ${username}`);
       document.getElementById('secondary-actions').style.display = 'flex';
       document.getElementById('username-label').style.display = 'block';
-      document.getElementById('display-name').textContent = username;
 
-      // Show user avatar
+      const labelEl = document.getElementById('username-label');
+      const displayNameEl = document.getElementById('display-name');
+      if (clanMatch) {
+        svg.setAttribute('aria-label', `${clanMatch.displayName} clan tartan`);
+        labelEl.childNodes[0].textContent = 'The ';
+        displayNameEl.textContent = clanMatch.displayName + ' tartan';
+      } else {
+        svg.setAttribute('aria-label', `Generated tartan pattern for ${username}`);
+        labelEl.childNodes[0].textContent = 'The tartan of ';
+        displayNameEl.textContent = username;
+      }
+
+      // Show user avatar (only for non-clan lookups, as clan names aren't GitHub users)
       const avatar = document.getElementById('user-avatar');
-      avatar.src = `https://github.com/${encodeURIComponent(username)}.png?size=56`;
-      avatar.alt = username;
-      avatar.style.display = 'inline';
-      avatar.onerror = function() { this.style.display = 'none'; };
+      if (clanMatch) {
+        avatar.style.display = 'none';
+      } else {
+        avatar.src = `https://github.com/${encodeURIComponent(username)}.png?size=56`;
+        avatar.alt = username;
+        avatar.style.display = 'inline';
+        avatar.onerror = function() { this.style.display = 'none'; };
+      }
 
       displaySett(sett);
 
