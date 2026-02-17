@@ -72,6 +72,18 @@
       padding: 2rem 1rem;
     }
 
+    .invertocat-wrap {
+      display: inline-block;
+      width: 120px;
+      height: 120px;
+      margin-bottom: 0.75rem;
+    }
+
+    .invertocat-wrap svg {
+      width: 100%;
+      height: 100%;
+    }
+
     header {
       text-align: center;
       margin-bottom: 2rem;
@@ -532,6 +544,19 @@
 <!-- If you're reading this, you're the kind of person who views source. We like you. -->
 <body>
   <header>
+    <div class="invertocat-wrap">
+      <svg id="invertocat-svg" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <clipPath id="octocat-clip">
+            <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"/>
+          </clipPath>
+          <pattern id="octocat-tartan" patternUnits="userSpaceOnUse" x="0" y="0" width="16" height="16">
+            <rect width="16" height="16" fill="#1c2541"/>
+          </pattern>
+        </defs>
+        <rect width="16" height="16" clip-path="url(#octocat-clip)" fill="url(#octocat-tartan)"/>
+      </svg>
+    </div>
     <h1><a href="#" id="logo-link">Dev <span class="accent">Tartan</span></a></h1>
     <div class="divider"></div>
     <p class="subtitle">Every developer deserves their own clan</p>
@@ -2535,6 +2560,78 @@
           return '📖 Available commands listed above.';
         }
       };
+    })();
+
+    // ── Invertocat random tartan fill ────────────────────────────────
+    (function fillInvertocatTartan() {
+      const pat = document.getElementById('octocat-tartan');
+      if (!pat) return;
+      const palette = PALETTES.traditional;
+      const size = 16;
+      pat.setAttribute('width', size);
+      pat.setAttribute('height', size);
+      pat.innerHTML = '';
+
+      // Pick 4–6 random colours
+      const numColors = 4 + Math.floor(Math.random() * 3);
+      const colors = [];
+      while (colors.length < numColors) {
+        const c = palette[Math.floor(Math.random() * palette.length)];
+        if (!colors.find(x => x.hex === c.hex)) colors.push(c);
+      }
+
+      // Random stripe widths
+      const stripes = colors.map(c => ({
+        color: c.hex,
+        width: 1 + Math.floor(Math.random() * 3)
+      }));
+
+      // Mirror the sett
+      const mirror = stripes.length > 1
+        ? [...stripes, ...stripes.slice(1, -1).reverse()]
+        : stripes;
+
+      const total = mirror.reduce((s, st) => s + st.width, 0);
+      const scale = size / total;
+
+      // Background
+      const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      bg.setAttribute('width', size);
+      bg.setAttribute('height', size);
+      bg.setAttribute('fill', colors[0].hex);
+      pat.appendChild(bg);
+
+      // Warp (vertical stripes)
+      let x = 0;
+      for (let rep = 0; rep < 3; rep++) {
+        for (const st of mirror) {
+          const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          r.setAttribute('x', x * scale);
+          r.setAttribute('y', 0);
+          r.setAttribute('width', st.width * scale);
+          r.setAttribute('height', size);
+          r.setAttribute('fill', st.color);
+          r.setAttribute('opacity', '0.7');
+          pat.appendChild(r);
+          x += st.width;
+        }
+      }
+
+      // Weft (horizontal stripes)
+      let y = 0;
+      for (let rep = 0; rep < 3; rep++) {
+        for (const st of mirror) {
+          const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          r.setAttribute('x', 0);
+          r.setAttribute('y', y * scale);
+          r.setAttribute('width', size);
+          r.setAttribute('height', st.width * scale);
+          r.setAttribute('fill', st.color);
+          r.setAttribute('opacity', '0.5');
+          pat.appendChild(r);
+          y += st.width;
+        }
+      }
     })();
   </script>
   <!--
