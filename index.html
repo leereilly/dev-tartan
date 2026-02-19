@@ -635,8 +635,6 @@
     <a id="share-bluesky" href="#" target="_blank" rel="noopener" aria-label="Share on Bluesky">Bluesky</a>
     <a id="share-linkedin" href="#" target="_blank" rel="noopener" aria-label="Share on LinkedIn">LinkedIn</a>
     <a id="share-threads" href="#" target="_blank" rel="noopener" aria-label="Share on Threads">Threads</a>
-    <a id="share-reddit" href="#" target="_blank" rel="noopener" aria-label="Share on Reddit">Reddit</a>
-    <a id="share-hn" href="#" target="_blank" rel="noopener" aria-label="Share on Hacker News">HN</a>
     <a id="share-copy" href="#" aria-label="Copy link to clipboard">📋 Copy Link</a>
   </div>
 
@@ -1671,7 +1669,6 @@
       const text = `🏴󠁧󠁢󠁳󠁣󠁴󠁿 I found my developer clan tartan! Every GitHub username generates a unique, deterministic plaid. What's yours? #DevTartan #GitHub`;
       const encodedText = encodeURIComponent(`${text} ${url}`);
       const encodedUrl = encodeURIComponent(url);
-      const title = encodeURIComponent(`Dev Tartan — ${username}'s developer clan tartan`);
 
       document.getElementById('share-x').href =
         `https://x.com/intent/tweet?text=${encodedText}`;
@@ -1681,10 +1678,6 @@
         `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
       document.getElementById('share-threads').href =
         `https://threads.net/intent/post?text=${encodedText}`;
-      document.getElementById('share-reddit').href =
-        `https://www.reddit.com/submit?url=${encodedUrl}&title=${title}`;
-      document.getElementById('share-hn').href =
-        `https://news.ycombinator.com/submitlink?u=${encodedUrl}&t=${title}`;
 
       const copyLink = document.getElementById('share-copy');
       copyLink.onclick = function(e) {
