@@ -211,9 +211,12 @@
       text-align: center;
     }
 
-    .illustration svg {
+    .illustration svg,
+    .illustration img {
       border-radius: 4px;
       border: 1px solid #c4b48a;
+      max-width: 100%;
+      height: auto;
     }
 
     .illustration-caption {
@@ -344,7 +347,7 @@
     body.dark-mode .content a:hover { text-decoration-color: #e07040; }
     body.dark-mode .content th { background: rgba(139,119,75,0.15); color: #f0e8d0; }
     body.dark-mode .content th, body.dark-mode .content td { border-color: #6b5240; }
-    body.dark-mode .illustration svg { border-color: #6b5240; }
+    body.dark-mode .illustration svg, body.dark-mode .illustration img { border-color: #6b5240; }
     body.dark-mode .illustration-caption { color: #b5a78a; }
     body.dark-mode .illustration-row .illustration-label { color: #b5a78a; }
     body.dark-mode .illustration-row .illustration-op { color: #b5a78a; }
@@ -377,6 +380,15 @@
     <p>Dev Tartan generates a unique, deterministic tartan pattern from any GitHub username. Same username, same tartan, every time. It is a single HTML file with zero dependencies: no npm, no build step, no framework, no existential dread. Your build pipeline is your browser.</p>
 
     <p>It was built entirely using <a href="https://github.com/features/copilot/cli">GitHub Copilot CLI</a> for the <a href="https://dev.to/leereilly/dev-tartan-deterministic-plaid-from-a-github-username-101m">GitHub Copilot CLI Coding Challenge</a>.</p>
+
+    <h2>What Are Tartans and Kilts?</h2>
+
+    <p>A tartan is a pattern of crisscrossed horizontal and vertical stripes in multiple colors, originating in woven cloth. Each tartan's unique arrangement of colors and stripe widths is called a <strong>sett</strong>, and specific tartans have historically been associated with Scottish clans, families, and regions. A kilt is the traditional Scottish garment made from tartan cloth — a knee-length, pleated wrap worn around the waist. Once everyday Highland dress, kilts are now most often seen at weddings, ceilidhs, and other formal occasions.</p>
+
+    <div class="illustration">
+      <img src="lee-michelle.png" alt="Lee wearing a kilt at his wedding with his wife Michelle" width="600">
+      <div class="illustration-caption">Me in a kilt getting married to my smokin' hot wife.</div>
+    </div>
 
     <h2>How It Works: The Pipeline</h2>
 
