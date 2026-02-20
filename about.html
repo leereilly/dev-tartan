@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About | Dev Tartan</title>
+  <meta name="description" content="How Dev Tartan works: SHA-256 hashing, sett derivation, SVG rendering, and Web Audio bagpipes. The nerdy details behind turning a GitHub username into a deterministic tartan.">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#1c2541">
+  <link rel="canonical" href="https://leereilly.net/dev-tartan/about.html">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231c2541'/%3E%3Crect x='0' y='6' width='32' height='4' fill='%238b1a1a' opacity='0.8'/%3E%3Crect x='0' y='22' width='32' height='4' fill='%238b1a1a' opacity='0.8'/%3E%3Crect x='6' y='0' width='4' height='32' fill='%231a472a' opacity='0.8'/%3E%3Crect x='22' y='0' width='4' height='32' fill='%231a472a' opacity='0.8'/%3E%3Crect x='14' y='0' width='2' height='32' fill='%23c5a041' opacity='0.6'/%3E%3Crect x='0' y='14' width='32' height='2' fill='%23c5a041' opacity='0.6'/%3E%3C/svg%3E">
+
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Text:ital@0;1&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Text:ital@0;1&display=swap"></noscript>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #f4edd3;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(139,119,75,0.03) 50px, rgba(139,119,75,0.03) 51px),
+        repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(139,119,75,0.03) 50px, rgba(139,119,75,0.03) 51px);
+      font-family: 'Crimson Text', 'Georgia', serif;
+      color: #2c1810;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', 'Georgia', serif;
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: #1a0f08;
+      letter-spacing: 0.04em;
+      margin-bottom: 0.25rem;
+    }
+
+    header h1 a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    header h1 a:hover {
+      text-decoration: underline;
+      text-decoration-color: #8b2500;
+      text-underline-offset: 4px;
+    }
+
+    header h1 .accent { color: #8b2500; }
+
+    .divider {
+      width: 200px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #8b774b, transparent);
+      margin: 0.75rem auto;
+    }
+
+    .header-nav {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .header-nav a {
+      font-family: 'Crimson Text', serif;
+      font-size: 1rem;
+      color: #6b5240;
+      text-decoration: none;
+      padding: 0.2rem 0;
+      border-bottom: 1px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .header-nav a:hover {
+      color: #8b2500;
+      border-bottom-color: #8b2500;
+    }
+
+    .content {
+      max-width: 720px;
+      width: 100%;
+      line-height: 1.75;
+    }
+
+    .content h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      color: #3d2b1f;
+      margin: 2rem 0 0.75rem;
+    }
+
+    .content h2:first-child {
+      margin-top: 0;
+    }
+
+    .content h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: #5a4232;
+      margin: 1.5rem 0 0.5rem;
+    }
+
+    .content p {
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+
+    .content ul, .content ol {
+      margin: 0.5rem 0 1rem 1.5rem;
+      font-size: 1.1rem;
+    }
+
+    .content li {
+      margin-bottom: 0.4rem;
+    }
+
+    .content code {
+      font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+      font-size: 0.9em;
+      background: rgba(139,119,75,0.1);
+      padding: 0.15em 0.4em;
+      border-radius: 3px;
+      color: #5a4232;
+    }
+
+    .content pre {
+      background: #2c1810;
+      color: #f0e8d0;
+      padding: 1rem 1.25rem;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 0.75rem 0 1.25rem;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .content pre code {
+      background: none;
+      padding: 0;
+      color: inherit;
+      font-size: inherit;
+    }
+
+    .content a {
+      color: #8b2500;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      text-decoration-color: rgba(139,37,0,0.3);
+      transition: text-decoration-color 0.2s;
+    }
+
+    .content a:hover {
+      text-decoration-color: #8b2500;
+    }
+
+    .content .table-wrap {
+      overflow-x: auto;
+      margin: 0.75rem 0 1.25rem;
+    }
+
+    .content table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 1rem;
+    }
+
+    .content th, .content td {
+      padding: 0.5rem 0.75rem;
+      border: 1px solid #c4b48a;
+      text-align: left;
+    }
+
+    .content th {
+      background: rgba(139,119,75,0.12);
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #3d2b1f;
+    }
+
+    .content td code {
+      font-size: 0.85em;
+    }
+
+    footer {
+      margin-top: auto;
+      padding-top: 2rem;
+      text-align: center;
+      color: #8b774b;
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+
+    footer a {
+      color: #8b774b;
+    }
+
+    @media (max-width: 600px) {
+      header h1 { font-size: 2rem; }
+      .content h2 { font-size: 1.3rem; }
+      .content { padding: 0 0.25rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1><a href="index.html">Dev <span class="accent">Tartan</span></a></h1>
+    <div class="divider"></div>
+    <nav class="header-nav">
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="https://github.com/leereilly/dev-tartan">Source</a>
+    </nav>
+  </header>
+
+  <div class="content">
+    <h2>About Dev Tartan</h2>
+
+    <p>Dev Tartan generates a unique, deterministic tartan pattern from any GitHub username. Same username, same tartan, every time. It is a single HTML file with zero dependencies: no npm, no build step, no framework, no existential dread. Your build pipeline is your browser.</p>
+
+    <p>It was built entirely using <a href="https://github.com/features/copilot/cli">GitHub Copilot CLI</a> for the <a href="https://dev.to/leereilly/dev-tartan-deterministic-plaid-from-a-github-username-101m">GitHub Copilot CLI Coding Challenge</a>.</p>
+
+    <h2>How It Works: The Pipeline</h2>
+
+    <p>Every tartan flows through a five-stage pipeline: <strong>hash → derive → mirror → render → ambiance</strong>. Here is what happens at each stage.</p>
+
+    <h3>1. Hashing: Username to Entropy</h3>
+
+    <p>Your username is lowercased and passed into the <a href="https://en.wikipedia.org/wiki/SHA-256">SHA-256</a> cryptographic hash function via the <code>SubtleCrypto.digest()</code> method from the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API">Web Crypto API</a>. This produces 32 bytes (256 bits) of deterministic, uniformly distributed output. The critical property here is the <a href="https://en.wikipedia.org/wiki/Avalanche_effect">avalanche effect</a>: changing a single character in the input flips, on average, half the bits in the output. <code>octocat</code> and <code>octocot</code> produce entirely different tartans.</p>
+
+    <pre><code>"octocat" → toLowerCase() → TextEncoder.encode() → crypto.subtle.digest("SHA-256", ...) → Uint8Array(32)</code></pre>
+
+    <p>Since usernames are lowercased before hashing, <code>octocat</code> and <code>Octocat</code> map to the same tartan. This matches GitHub's own case-insensitive username behavior.</p>
+
+    <h3>2. Sett Derivation: From Bytes to Stripes</h3>
+
+    <p>A tartan's repeating unit is called a <strong>sett</strong>. Dev Tartan carves one out of the SHA-256 hash bytes using modular arithmetic:</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Hash Byte(s)</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>byte[0]</code></td><td>Number of colors: <code>4 + (byte % 3)</code>, yielding 4, 5, or 6 colors</td></tr>
+          <tr><td><code>bytes[1..6]</code></td><td>Color selection: each byte indexes into a 20-color palette via <code>byte % 20</code></td></tr>
+          <tr><td><code>bytes[8..13]</code></td><td>Thread counts (stripe widths), bucketed into <strong>thin</strong> (2-6), <strong>medium</strong> (8-16), or <strong>wide</strong> (18-36) based on byte value thresholds</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Duplicate colors are avoided by bumping the palette index by 7 (a coprime offset relative to the palette size of 20). This ensures even colliding byte values resolve to distinct colors.</p>
+
+    <p>Three palettes are available: <strong>Traditional</strong> (20 colors inspired by historical Scottish dye sources, from woad-adjacent navies to lichen-derived golds), <strong>GitHub</strong> (contribution graph greens), and <strong>Microsoft</strong> (the four Windows logo colors and their variants).</p>
+
+    <h3>3. Symmetry: The Mirror Trick</h3>
+
+    <p>Real tartans use <strong>reflective symmetry</strong>: the sett plays forward and then reverses, creating a palindromic stripe sequence. Given stripes <code>[A, B, C, D]</code>, the rendered sequence becomes:</p>
+
+    <pre><code>A  B  C  D  C  B  A  B  C  D  C  B  A  ...
+└──forward──┘  └─reverse─┘  └──forward──┘</code></pre>
+
+    <p>The reversal omits the first and last elements to avoid doubled stripes at the pivot points. This is the same technique used in traditional tartan weaving. If you have ever reversed a linked list in a coding interview, congratulations: you were unknowingly training to weave tartan.</p>
+
+    <h3>4. Rendering: Warp, Weft, and SVG Rectangles</h3>
+
+    <p>Real tartan is a <strong>2/2 twill weave</strong>: warp threads (vertical) and weft threads (horizontal) interlace at right angles. Dev Tartan simulates this using layered SVG <code>&lt;rect&gt;</code> elements:</p>
+
+    <ol>
+      <li><strong>Background fill:</strong> the first color of the sett floods the 500x500 SVG canvas</li>
+      <li><strong>Warp stripes:</strong> vertical rectangles at 90% opacity</li>
+      <li><strong>Weft stripes:</strong> horizontal rectangles at 55% opacity with <code>mix-blend-mode: multiply</code>, simulating thread crossings where colors optically blend</li>
+      <li><strong>Twill texture overlay:</strong> a tiny 4x4px repeating SVG <code>&lt;pattern&gt;</code> of alternating semi-transparent light/dark squares, mimicking the diagonal twill ridges visible in real woven cloth</li>
+    </ol>
+
+    <p>The sett is scaled so that roughly three full repeats tile across the canvas. Each stripe's pixel width is computed from its thread count, multiplied by a scale factor derived from the total sett width.</p>
+
+    <h3>5. Ambiance: Background Tartanification</h3>
+
+    <p>After rendering, a miniature version of your tartan is serialized as a <code>data:</code> URI SVG tile (160x160px) with very low opacity (6-8%) and set as the page's repeating <code>background-image</code>. The entire viewport becomes subtly tartanified.</p>
+
+    <h2>Clan Tartans</h2>
+
+    <p>If your GitHub username matches one of 106 real Scottish clan names, Dev Tartan renders the <strong>authentic clan tartan</strong> instead of generating one from the hash. Sett definitions were sourced from public-domain tartan registries, principally the <a href="https://www.tartanregister.gov.uk/">Scottish Register of Tartans</a> and cross-referenced with the <a href="https://www.tartansauthority.com/">Scottish Tartans Authority</a>.</p>
+
+    <p>Each sett is encoded as a compact string of standard tartan weaving abbreviations and thread counts (e.g., <code>R 72 B 8 BK 12 Y 2</code>). The lookup is case-insensitive and supports common alternate spellings: <code>Mc</code> prefixes resolve to <code>Mac</code>, <code>Stuart</code> resolves to Stewart Royal, <code>Ogilvie</code> to Ogilvy, and so on.</p>
+
+    <h2>The Bagpipe Synthesizer</h2>
+
+    <p>Every username also gets a unique, deterministic bagpipe tune synthesized entirely in the browser via the <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API">Web Audio API</a>. The audio graph looks like this:</p>
+
+    <ul>
+      <li><strong>Three drone pipes</strong> (bass, tenor, alto) built from pairs of detuned <code>OscillatorNode</code>s with sawtooth and triangle waveforms, producing the sustained harmonic drone characteristic of Highland bagpipes</li>
+      <li><strong>A chanter melody</strong> derived from your username hash, using a pentatonic scale. Hash bytes select note indices, durations, and ornament patterns (grace notes, doublings, throws) from the Piobaireachd tradition</li>
+      <li><strong>Breath noise</strong> modeled with a white noise buffer filtered through a <code>BiquadFilterNode</code> (bandpass, 800 Hz center) and amplitude-modulated at 0.3 Hz to simulate the cyclic pressure of a bag under the piper's arm</li>
+      <li><strong>Convolution reverb</strong> synthesized from a procedurally generated impulse response, adding a sense of acoustic space</li>
+    </ul>
+
+    <p>The tune can be downloaded as a 16-bit PCM WAV file, rendered offline via <code>OfflineAudioContext</code>.</p>
+
+    <h2>The Invertocat</h2>
+
+    <p>The GitHub Invertocat logo in the header is not a static image. It is an SVG <code>&lt;clipPath&gt;</code> filled with a dynamically generated tartan <code>&lt;pattern&gt;</code>. When you generate a tartan, the Invertocat updates to wear your tartan as its fill. The clip path uses the official Invertocat SVG path data from <a href="https://github.com/logos">GitHub's logo page</a>.</p>
+
+    <h2>The Character</h2>
+
+    <p>After generating a tartan, a small procedurally generated SVG character appears wearing your tartan as a kilt. The character's features (skin tone, hair color, hair style, eye color, and expression) are derived from later bytes in the SHA-256 hash, making each character as deterministic and unique as the tartan itself.</p>
+
+    <h2>Technical Constraints</h2>
+
+    <ul>
+      <li><strong>Zero dependencies.</strong> The entire application is a single HTML file. No npm packages, no bundler, no transpiler, no framework. Every line of CSS and JavaScript lives inline.</li>
+      <li><strong>No server.</strong> All computation runs client-side. The only network request is an optional call to the GitHub Events API to populate the gallery of recently active developers.</li>
+      <li><strong>Deterministic output.</strong> Given the same username and palette, the tartan, character, and bagpipe tune are identical on every run, on every browser, on every device. This is a pure function of SHA-256.</li>
+      <li><strong>~2,700 lines.</strong> That is the entire codebase. HTML structure, CSS styling, SVG rendering, audio synthesis, 106 clan tartan definitions, and a procedural character generator, all in one file.</li>
+    </ul>
+
+    <h2>The Numbers</h2>
+
+    <ul>
+      <li>SHA-256 produces 2<sup>256</sup> possible hashes, which is roughly 1.16 x 10<sup>77</sup>. That is more possible tartans than there are atoms in the observable universe.</li>
+      <li>The traditional palette has 20 colors. With 4-6 colors per sett and 3 width buckets per stripe, the combinatorial space is enormous even before the hash enters the picture.</li>
+      <li>The 4x4 twill overlay pattern contains 16 sub-cells, alternating between <code>rgba(255,255,255,0.03)</code> and <code>rgba(0,0,0,0.04)</code>, faithfully approximating the diagonal ridge pattern of a 2/2 twill weave at pixel scale.</li>
+    </ul>
+
+    <h2>Colophon</h2>
+
+    <p>Dev Tartan was built entirely with <a href="https://github.com/features/copilot/cli">GitHub Copilot CLI</a>. The typefaces are <a href="https://fonts.google.com/specimen/Playfair+Display">Playfair Display</a> for headings and <a href="https://fonts.google.com/specimen/Crimson+Text">Crimson Text</a> for body copy, both loaded via Google Fonts with <code>font-display: swap</code> to avoid layout shift. The color scheme is inspired by aged parchment and Scottish earth tones.</p>
+
+    <p>Source code is on <a href="https://github.com/leereilly/dev-tartan">GitHub</a>. Licensed under <a href="https://github.com/leereilly/dev-tartan/blob/main/LICENSE">MIT</a>.</p>
+  </div>
+
+  <footer>
+    <p>Woven with bits &amp; bytes &bull; SHA-256 &rarr; Sett</p>
+    <p><a href="https://github.com/leereilly/dev-tartan">Source on GitHub</a> &bull; Built with <a href="https://github.com/features/copilot">GitHub Copilot CLI</a></p>
+  </footer>
+</body>
+</html>
