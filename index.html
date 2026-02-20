@@ -1827,8 +1827,8 @@
 
       let svgParts = [];
       svgParts.push(`<svg xmlns="http://www.w3.org/2000/svg" width="${tileSize}" height="${tileSize}">`);
-      // White base so the washed-out pattern stays near-white
-      svgParts.push(`<rect width="${tileSize}" height="${tileSize}" fill="#f4edd3"/>`);
+      // Dark base so the washed-out pattern stays near the body background
+      svgParts.push(`<rect width="${tileSize}" height="${tileSize}" fill="#1a1a2e"/>`);
 
       // Warp (vertical stripes) at very low opacity
       svgParts.push(`<g opacity="0.08">`);
