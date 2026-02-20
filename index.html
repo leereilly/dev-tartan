@@ -1808,6 +1808,7 @@
       copyLink.onclick = function(e) {
         e.preventDefault();
         navigator.clipboard.writeText(url).then(() => {
+          gtag('event', 'copy_link', { username: username });
           const orig = copyLink.textContent;
           copyLink.textContent = '✅ Copied!';
           setTimeout(() => { copyLink.textContent = orig; }, 2000);
@@ -2416,6 +2417,7 @@
       }
       url.hash = '';
       window.history.pushState({ username, palette: currentPalette }, '', url);
+      gtag('event', 'generate_tartan', { username: username, palette: currentPalette });
       generateTartan(username);
       document.getElementById('gallery-section').classList.add('hidden');
     });
@@ -2481,16 +2483,26 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    document.getElementById('download-btn').addEventListener('click', downloadSVG);
+    document.getElementById('download-btn').addEventListener('click', () => {
+      const username = document.getElementById('username').value.trim().replace(/^@/, '');
+      gtag('event', 'download_svg', { username: username, palette: currentPalette });
+      downloadSVG();
+    });
 
     document.getElementById('bagpipe-btn').addEventListener('click', () => {
       const username = document.getElementById('username').value.trim().replace(/^@/, '');
-      if (username) playBagpipes(username);
+      if (username) {
+        gtag('event', 'play_bagpipes', { username: username });
+        playBagpipes(username);
+      }
     });
 
     document.getElementById('download-bagpipe-btn').addEventListener('click', () => {
       const username = document.getElementById('username').value.trim().replace(/^@/, '');
-      if (username) downloadBagpipes(username);
+      if (username) {
+        gtag('event', 'download_tune', { username: username });
+        downloadBagpipes(username);
+      }
     });
 
     // Palette toggle
@@ -2498,6 +2510,7 @@
       radio.addEventListener('change', (e) => {
         currentPalette = e.target.value;
         TARTAN_PALETTE = PALETTES[currentPalette];
+        gtag('event', 'select_palette', { palette: currentPalette });
         const url = new URL(window.location);
         if (currentPalette !== 'traditional') {
           url.searchParams.set('palette', currentPalette);
