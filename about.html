@@ -283,42 +283,83 @@
       }
     }
 
-    /* ── Dark mode ────────────────────────────────────────── */
-    @media (prefers-color-scheme: dark) {
-      body {
-        background: #1a1a2e;
-        background-image:
-          repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(139,119,75,0.05) 50px, rgba(139,119,75,0.05) 51px),
-          repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(139,119,75,0.05) 50px, rgba(139,119,75,0.05) 51px);
-        color: #e0d8c0;
-      }
-      header h1, header h1 a { color: #f0e8d0; }
-      header h1 a:hover { text-decoration-color: #e07040; }
-      .header-nav a { color: #b5a78a; }
-      .header-nav a:hover { color: #e07040; border-bottom-color: #e07040; }
-      .divider { background: linear-gradient(90deg, transparent, #6b5240, transparent); }
-      .content h2 { color: #f0e8d0; }
-      .content h3 { color: #d0c8b0; }
-      .content p, .content li { color: #e0d8c0; }
-      .content code { background: rgba(139,119,75,0.2); color: #d0c8b0; }
-      .content pre { background: #0e0e1a; color: #f0e8d0; }
-      .content a { color: #e07040; text-decoration-color: rgba(224,112,64,0.3); }
-      .content a:hover { text-decoration-color: #e07040; }
-      .content th { background: rgba(139,119,75,0.15); color: #f0e8d0; }
-      .content th, .content td { border-color: #6b5240; }
-      .illustration svg { border-color: #6b5240; }
-      .illustration-caption { color: #b5a78a; }
-      .illustration-row .illustration-label { color: #b5a78a; }
-      .illustration-row .illustration-op { color: #b5a78a; }
-      footer { color: #6b5240; }
-      footer a { color: #6b5240; }
-      :focus-visible { outline-color: #e07040; }
-      .skip-link { background: #e07040; color: #1a1a2e; }
+    /* ── Theme toggle button ─────────────────────────────── */
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+      background: rgba(44,24,16,0.08);
+      border: 2px solid rgba(139,119,75,0.3);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s, border-color 0.3s, transform 0.2s;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
+    .theme-toggle:hover {
+      background: rgba(44,24,16,0.15);
+      border-color: rgba(139,119,75,0.5);
+      transform: scale(1.1);
+    }
+    .theme-toggle:active { transform: scale(0.95); }
+    .theme-toggle .icon-sun { display: inline; }
+    .theme-toggle .icon-moon { display: none; }
+    .dark-mode .theme-toggle {
+      background: rgba(240,232,208,0.1);
+      border-color: rgba(107,82,64,0.5);
+    }
+    .dark-mode .theme-toggle:hover {
+      background: rgba(240,232,208,0.2);
+      border-color: rgba(224,112,64,0.6);
+    }
+    .dark-mode .theme-toggle .icon-sun { display: none; }
+    .dark-mode .theme-toggle .icon-moon { display: inline; }
+
+    /* ── Dark mode ────────────────────────────────────────── */
+    body.dark-mode {
+      background: #1a1a2e;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(139,119,75,0.05) 50px, rgba(139,119,75,0.05) 51px),
+        repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(139,119,75,0.05) 50px, rgba(139,119,75,0.05) 51px);
+      color: #e0d8c0;
+    }
+    body.dark-mode header h1, body.dark-mode header h1 a { color: #f0e8d0; }
+    body.dark-mode header h1 a:hover { text-decoration-color: #e07040; }
+    body.dark-mode .header-nav a { color: #b5a78a; }
+    body.dark-mode .header-nav a:hover { color: #e07040; border-bottom-color: #e07040; }
+    body.dark-mode .divider { background: linear-gradient(90deg, transparent, #6b5240, transparent); }
+    body.dark-mode .content h2 { color: #f0e8d0; }
+    body.dark-mode .content h3 { color: #d0c8b0; }
+    body.dark-mode .content p, body.dark-mode .content li { color: #e0d8c0; }
+    body.dark-mode .content code { background: rgba(139,119,75,0.2); color: #d0c8b0; }
+    body.dark-mode .content pre { background: #0e0e1a; color: #f0e8d0; }
+    body.dark-mode .content a { color: #e07040; text-decoration-color: rgba(224,112,64,0.3); }
+    body.dark-mode .content a:hover { text-decoration-color: #e07040; }
+    body.dark-mode .content th { background: rgba(139,119,75,0.15); color: #f0e8d0; }
+    body.dark-mode .content th, body.dark-mode .content td { border-color: #6b5240; }
+    body.dark-mode .illustration svg { border-color: #6b5240; }
+    body.dark-mode .illustration-caption { color: #b5a78a; }
+    body.dark-mode .illustration-row .illustration-label { color: #b5a78a; }
+    body.dark-mode .illustration-row .illustration-op { color: #b5a78a; }
+    body.dark-mode footer { color: #6b5240; }
+    body.dark-mode footer a { color: #6b5240; }
+    body.dark-mode :focus-visible { outline-color: #e07040; }
+    body.dark-mode .skip-link { background: #e07040; color: #1a1a2e; }
 
   </style>
 </head>
 <body>
+  <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle light/dark mode">
+    <span class="icon-sun">☀️</span>
+    <span class="icon-moon">🌙</span>
+  </button>
   <a href="#about-content" class="skip-link">Skip to content</a>
   <header>
     <h1><a href="index.html">Dev <span class="accent">Tartan</span></a></h1>
@@ -566,5 +607,19 @@
     <p>Woven with bits &amp; bytes &bull; SHA-256 &rarr; Sett</p>
     <p><a href="https://github.com/leereilly/dev-tartan">Source on GitHub</a> &bull; Built with <a href="https://github.com/features/copilot">GitHub Copilot CLI</a></p>
   </footer>
+
+  <script>
+    // Theme toggle — default to light mode, persist choice in localStorage
+    (function() {
+      const toggle = document.getElementById('theme-toggle');
+      const stored = localStorage.getItem('dev-tartan-theme');
+      if (stored === 'dark') document.body.classList.add('dark-mode');
+      toggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('dev-tartan-theme', isDark ? 'dark' : 'light');
+      });
+    })();
+  </script>
 </body>
 </html>
