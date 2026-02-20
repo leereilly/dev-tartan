@@ -2713,7 +2713,7 @@
       const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
       bg.setAttribute('width', size);
       bg.setAttribute('height', size);
-      bg.setAttribute('fill', sett[0].color);
+      bg.setAttribute('fill', sett[0].color.hex);
       pat.appendChild(bg);
 
       let x = 0;
@@ -2722,7 +2722,7 @@
           const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
           r.setAttribute('x', x * scale); r.setAttribute('y', 0);
           r.setAttribute('width', st.width * scale); r.setAttribute('height', size);
-          r.setAttribute('fill', st.color); r.setAttribute('opacity', '0.7');
+          r.setAttribute('fill', st.color.hex); r.setAttribute('opacity', '0.7');
           pat.appendChild(r); x += st.width;
         }
       }
@@ -2733,7 +2733,7 @@
           const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
           r.setAttribute('x', 0); r.setAttribute('y', y * scale);
           r.setAttribute('width', size); r.setAttribute('height', st.width * scale);
-          r.setAttribute('fill', st.color); r.setAttribute('opacity', '0.5');
+          r.setAttribute('fill', st.color.hex); r.setAttribute('opacity', '0.5');
           pat.appendChild(r); y += st.width;
         }
       }
