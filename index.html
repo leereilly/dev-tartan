@@ -682,67 +682,108 @@
       .gallery-card:focus-visible { transform: none; }
     }
 
-    /* ── Dark mode ────────────────────────────────────────── */
-    @media (prefers-color-scheme: dark) {
-      body {
-        background: #1a1a2e;
-        background-image:
-          repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(139,119,75,0.05) 50px, rgba(139,119,75,0.05) 51px),
-          repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(139,119,75,0.05) 50px, rgba(139,119,75,0.05) 51px);
-        color: #e0d8c0;
-      }
-      header h1, header h1 a { color: #f0e8d0; }
-      header p.subtitle { color: #b5a78a; }
-      .header-nav a { color: #b5a78a; }
-      .header-nav a:hover { color: #e07040; border-bottom-color: #e07040; }
-      .divider { background: linear-gradient(90deg, transparent, #6b5240, transparent); }
-      .input-section label { color: #e0d8c0; }
-      .input-section input[type="text"] {
-        background: #2a2a40;
-        border-color: #6b5240;
-        color: #f0e8d0;
-      }
-      .input-section input[type="text"]::placeholder { color: #6b5240; }
-      .input-section input[type="text"]:focus { border-color: #e07040; }
-      button.generate-btn { background: #a52d00; border-color: #8b2500; }
-      button.generate-btn:hover { background: #c03500; }
-      .palette-toggle span { color: #b5a78a; }
-      .palette-toggle label { color: #b5a78a; border-color: #6b5240; }
-      .palette-toggle label:hover { color: #e07040; border-color: #e07040; }
-      .palette-toggle input[type="radio"]:checked + label { background: #a52d00; border-color: #8b2500; color: #f0e8d0; }
-      .username-label { color: #e0d8c0; }
-      .username-label span { color: #e07040; }
-      #tartan-display { border-color: #6b5240; background: #2a2a40; }
-      .sett-display h3 { color: #e0d8c0; }
-      .sett-swatch { border-color: #6b5240; }
-      .sett-label { color: #b5a78a; }
-      .sett-thread-count { color: #b5a78a; }
-      .share-links span { color: #b5a78a; }
-      .share-links a { color: #b5a78a; border-color: #6b5240; }
-      .share-links a:hover { color: #e07040; border-color: #e07040; background: rgba(224,112,64,0.06); }
-      button.download-btn { background: #1a472a; border-color: #0e3320; }
-      button.download-btn:hover { background: #2d5a27; }
-      button.bagpipe-btn { background: #5b2c6f; border-color: #3d1a4a; }
-      button.bagpipe-btn:hover { background: #7d3c98; }
-      button.download-bagpipe-btn { background: #4a1a5e; border-color: #3d1a4a; }
-      button.download-bagpipe-btn:hover { background: #6b2d8a; }
-      .gallery-section h2 { color: #f0e8d0; }
-      .gallery-section p.gallery-subtitle { color: #b5a78a; }
-      .gallery-card { border-color: #6b5240; background: #2a2a40; }
-      .gallery-card:hover { border-color: #e07040; }
-      .gallery-loading { color: #b5a78a; }
-      .gallery-loading .spinner { border-color: #6b5240; border-top-color: #e07040; }
-      footer { color: #6b5240; }
-      footer a { color: #6b5240; }
-      .input-error { color: #e07040; }
-      :focus-visible { outline-color: #e07040; }
-      .skip-link { background: #e07040; color: #1a1a2e; }
+    /* ── Theme toggle button ─────────────────────────────── */
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+      background: rgba(44,24,16,0.08);
+      border: 2px solid rgba(139,119,75,0.3);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s, border-color 0.3s, transform 0.2s;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
     }
+    .theme-toggle:hover {
+      background: rgba(44,24,16,0.15);
+      border-color: rgba(139,119,75,0.5);
+      transform: scale(1.1);
+    }
+    .theme-toggle:active { transform: scale(0.95); }
+    .theme-toggle .icon-sun { display: inline; }
+    .theme-toggle .icon-moon { display: none; }
+    .dark-mode .theme-toggle {
+      background: rgba(240,232,208,0.1);
+      border-color: rgba(107,82,64,0.5);
+    }
+    .dark-mode .theme-toggle:hover {
+      background: rgba(240,232,208,0.2);
+      border-color: rgba(224,112,64,0.6);
+    }
+    .dark-mode .theme-toggle .icon-sun { display: none; }
+    .dark-mode .theme-toggle .icon-moon { display: inline; }
+
+    /* ── Dark mode ────────────────────────────────────────── */
+    body.dark-mode {
+      background: #1a1a2e;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(139,119,75,0.05) 50px, rgba(139,119,75,0.05) 51px),
+        repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(139,119,75,0.05) 50px, rgba(139,119,75,0.05) 51px);
+      color: #e0d8c0;
+    }
+    body.dark-mode header h1, body.dark-mode header h1 a { color: #f0e8d0; }
+    body.dark-mode header p.subtitle { color: #b5a78a; }
+    body.dark-mode .header-nav a { color: #b5a78a; }
+    body.dark-mode .header-nav a:hover { color: #e07040; border-bottom-color: #e07040; }
+    body.dark-mode .divider { background: linear-gradient(90deg, transparent, #6b5240, transparent); }
+    body.dark-mode .input-section label { color: #e0d8c0; }
+    body.dark-mode .input-section input[type="text"] {
+      background: #2a2a40;
+      border-color: #6b5240;
+      color: #f0e8d0;
+    }
+    body.dark-mode .input-section input[type="text"]::placeholder { color: #6b5240; }
+    body.dark-mode .input-section input[type="text"]:focus { border-color: #e07040; }
+    body.dark-mode button.generate-btn { background: #a52d00; border-color: #8b2500; }
+    body.dark-mode button.generate-btn:hover { background: #c03500; }
+    body.dark-mode .palette-toggle span { color: #b5a78a; }
+    body.dark-mode .palette-toggle label { color: #b5a78a; border-color: #6b5240; }
+    body.dark-mode .palette-toggle label:hover { color: #e07040; border-color: #e07040; }
+    body.dark-mode .palette-toggle input[type="radio"]:checked + label { background: #a52d00; border-color: #8b2500; color: #f0e8d0; }
+    body.dark-mode .username-label { color: #e0d8c0; }
+    body.dark-mode .username-label span { color: #e07040; }
+    body.dark-mode #tartan-display { border-color: #6b5240; background: #2a2a40; }
+    body.dark-mode .sett-display h3 { color: #e0d8c0; }
+    body.dark-mode .sett-swatch { border-color: #6b5240; }
+    body.dark-mode .sett-label { color: #b5a78a; }
+    body.dark-mode .sett-thread-count { color: #b5a78a; }
+    body.dark-mode .share-links span { color: #b5a78a; }
+    body.dark-mode .share-links a { color: #b5a78a; border-color: #6b5240; }
+    body.dark-mode .share-links a:hover { color: #e07040; border-color: #e07040; background: rgba(224,112,64,0.06); }
+    body.dark-mode button.download-btn { background: #1a472a; border-color: #0e3320; }
+    body.dark-mode button.download-btn:hover { background: #2d5a27; }
+    body.dark-mode button.bagpipe-btn { background: #5b2c6f; border-color: #3d1a4a; }
+    body.dark-mode button.bagpipe-btn:hover { background: #7d3c98; }
+    body.dark-mode button.download-bagpipe-btn { background: #4a1a5e; border-color: #3d1a4a; }
+    body.dark-mode button.download-bagpipe-btn:hover { background: #6b2d8a; }
+    body.dark-mode .gallery-section h2 { color: #f0e8d0; }
+    body.dark-mode .gallery-section p.gallery-subtitle { color: #b5a78a; }
+    body.dark-mode .gallery-card { border-color: #6b5240; background: #2a2a40; }
+    body.dark-mode .gallery-card:hover { border-color: #e07040; }
+    body.dark-mode .gallery-loading { color: #b5a78a; }
+    body.dark-mode .gallery-loading .spinner { border-color: #6b5240; border-top-color: #e07040; }
+    body.dark-mode footer { color: #6b5240; }
+    body.dark-mode footer a { color: #6b5240; }
+    body.dark-mode .input-error { color: #e07040; }
+    body.dark-mode :focus-visible { outline-color: #e07040; }
+    body.dark-mode .skip-link { background: #e07040; color: #1a1a2e; }
 
   </style>
 </head>
 <!-- If you're reading this, you're the kind of person who views source. We like you. -->
 <body>
+  <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle light/dark mode">
+    <span class="icon-sun">☀️</span>
+    <span class="icon-moon">🌙</span>
+  </button>
   <a href="#tartan-form" class="skip-link">Skip to content</a>
   <header>
     <a href="https://leereilly.net/dev-tartan" class="invertocat-wrap" id="invertocat-link" aria-label="Dev Tartan home">
@@ -1822,8 +1863,7 @@
 
       // Draw the character wearing the tartan kilt (personalized via hash)
       renderCharacter(sett, hashBytes);
-      // Use the tartan as a repeating background with high contrast (near-white)
-      setTartanBackground(sett);
+      // Keep the default page background (same as landing page)
 
       // Fill invertocat with the user's tartan
       fillInvertocatWithSett(sett);
@@ -2533,8 +2573,6 @@
       window.history.replaceState({}, '', url);
       // Reset page title
       document.title = 'Dev Tartan — Generate a Unique Tartan from Your GitHub Username';
-      // Reset background
-      document.body.style.backgroundImage = '';
       // Re-randomize invertocat tartan
       fillInvertocatRandom();
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2973,5 +3011,18 @@
       SHA-256 hashes were, however,
       ruthlessly sliced into bytes.
   -->
+  <script>
+    // Theme toggle — default to light mode, persist choice in localStorage
+    (function() {
+      const toggle = document.getElementById('theme-toggle');
+      const stored = localStorage.getItem('dev-tartan-theme');
+      if (stored === 'dark') document.body.classList.add('dark-mode');
+      toggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('dev-tartan-theme', isDark ? 'dark' : 'light');
+      });
+    })();
+  </script>
 </body>
 </html>
