@@ -244,6 +244,28 @@
       font-family: 'Playfair Display', serif;
     }
 
+    /* ── Skip link ───────────────────────────────────────── */
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      background: #8b2500;
+      color: #f4edd3;
+      padding: 0.5rem 1rem;
+      z-index: 1000;
+      font-family: 'Crimson Text', serif;
+      border-radius: 0 0 4px 0;
+    }
+    .skip-link:focus {
+      left: 0;
+    }
+
+    /* ── Focus-visible ────────────────────────────────────── */
+    :focus-visible {
+      outline: 2px solid #8b2500;
+      outline-offset: 2px;
+    }
+
     @media (max-width: 600px) {
       header h1 { font-size: 2rem; }
       .content h2 { font-size: 1.3rem; }
@@ -251,9 +273,52 @@
       .illustration-row { gap: 0.5rem; }
       .illustration-row svg { width: 100px; height: 100px; }
     }
+
+    /* ── Reduced motion ───────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ── Dark mode ────────────────────────────────────────── */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #1a1a2e;
+        background-image:
+          repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(139,119,75,0.05) 50px, rgba(139,119,75,0.05) 51px),
+          repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(139,119,75,0.05) 50px, rgba(139,119,75,0.05) 51px);
+        color: #e0d8c0;
+      }
+      header h1, header h1 a { color: #f0e8d0; }
+      header h1 a:hover { text-decoration-color: #e07040; }
+      .header-nav a { color: #b5a78a; }
+      .header-nav a:hover { color: #e07040; border-bottom-color: #e07040; }
+      .divider { background: linear-gradient(90deg, transparent, #6b5240, transparent); }
+      .content h2 { color: #f0e8d0; }
+      .content h3 { color: #d0c8b0; }
+      .content p, .content li { color: #e0d8c0; }
+      .content code { background: rgba(139,119,75,0.2); color: #d0c8b0; }
+      .content pre { background: #0e0e1a; color: #f0e8d0; }
+      .content a { color: #e07040; text-decoration-color: rgba(224,112,64,0.3); }
+      .content a:hover { text-decoration-color: #e07040; }
+      .content th { background: rgba(139,119,75,0.15); color: #f0e8d0; }
+      .content th, .content td { border-color: #6b5240; }
+      .illustration svg { border-color: #6b5240; }
+      .illustration-caption { color: #b5a78a; }
+      .illustration-row .illustration-label { color: #b5a78a; }
+      .illustration-row .illustration-op { color: #b5a78a; }
+      footer { color: #6b5240; }
+      footer a { color: #6b5240; }
+      :focus-visible { outline-color: #e07040; }
+      .skip-link { background: #e07040; color: #1a1a2e; }
+    }
   </style>
 </head>
 <body>
+  <a href="#about-content" class="skip-link">Skip to content</a>
   <header>
     <h1><a href="index.html">Dev <span class="accent">Tartan</span></a></h1>
     <div class="divider"></div>
@@ -264,7 +329,7 @@
     </nav>
   </header>
 
-  <div class="content">
+  <div class="content" id="about-content">
     <h2>About Dev Tartan</h2>
 
     <p>Dev Tartan generates a unique, deterministic tartan pattern from any GitHub username. Same username, same tartan, every time. It is a single HTML file with zero dependencies: no npm, no build step, no framework, no existential dread. Your build pipeline is your browser.</p>

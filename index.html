@@ -590,6 +590,88 @@
       display: none;
     }
 
+    /* ── Skip link ───────────────────────────────────────── */
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 0;
+      background: #8b2500;
+      color: #f4edd3;
+      padding: 0.5rem 1rem;
+      z-index: 1000;
+      font-family: 'Crimson Text', serif;
+      border-radius: 0 0 4px 0;
+    }
+    .skip-link:focus {
+      left: 0;
+    }
+
+    /* ── Focus-visible ────────────────────────────────────── */
+    :focus-visible {
+      outline: 2px solid #8b2500;
+      outline-offset: 2px;
+    }
+    button:focus-visible {
+      outline: 2px solid #c5a041;
+      outline-offset: 2px;
+    }
+    .gallery-card:focus-visible {
+      outline: 3px solid #c5a041;
+      outline-offset: 2px;
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: 0 8px 24px rgba(44,24,16,0.18);
+    }
+
+    /* ── Responsive tartan SVG ────────────────────────────── */
+    #tartan-display {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* ── Error message ────────────────────────────────────── */
+    .input-error {
+      display: none;
+      color: #8b1a1a;
+      font-size: 0.95rem;
+      font-style: italic;
+      text-align: center;
+      margin-top: -1rem;
+      margin-bottom: 1rem;
+    }
+
+    /* ── Random button ────────────────────────────────────── */
+    button.random-btn {
+      background: transparent;
+      color: #6b5240;
+      border-color: #c4b48a;
+      font-size: 0.95rem;
+    }
+    button.random-btn:hover {
+      color: #8b2500;
+      border-color: #8b2500;
+    }
+
+    /* ── Generate button spinner ──────────────────────────── */
+    .generate-btn .btn-spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(244,237,211,0.3);
+      border-top-color: #f4edd3;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    @media (max-width: 768px) {
+      header h1 { font-size: 2.2rem; }
+      .input-section { gap: 0.5rem; }
+      button { min-height: 44px; min-width: 44px; }
+      .palette-toggle label { min-height: 44px; display: inline-flex; align-items: center; }
+      .share-links a { min-height: 44px; display: inline-flex; align-items: center; }
+    }
+
     @media (max-width: 600px) {
       header h1 { font-size: 2rem; }
       .input-section { width: 100%; padding: 0 0.5rem; }
@@ -599,10 +681,81 @@
       .gallery-card .card-avatar { width: 16px; height: 16px; }
       .gallery-card .card-username { font-size: 0.7rem; }
     }
+
+    /* ── Reduced motion ───────────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .gallery-card:hover { transform: none; }
+      .gallery-card:focus-visible { transform: none; }
+    }
+
+    /* ── Dark mode ────────────────────────────────────────── */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #1a1a2e;
+        background-image:
+          repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(139,119,75,0.05) 50px, rgba(139,119,75,0.05) 51px),
+          repeating-linear-gradient(90deg, transparent, transparent 50px, rgba(139,119,75,0.05) 50px, rgba(139,119,75,0.05) 51px);
+        color: #e0d8c0;
+      }
+      header h1, header h1 a { color: #f0e8d0; }
+      header p.subtitle { color: #b5a78a; }
+      .header-nav a { color: #b5a78a; }
+      .header-nav a:hover { color: #e07040; }
+      .divider { background: linear-gradient(90deg, transparent, #6b5240, transparent); }
+      .input-section label { color: #e0d8c0; }
+      .input-section input[type="text"] {
+        background: #2a2a40;
+        border-color: #6b5240;
+        color: #f0e8d0;
+      }
+      .input-section input[type="text"]::placeholder { color: #6b5240; }
+      .input-section input[type="text"]:focus { border-color: #e07040; }
+      button.generate-btn { background: #a52d00; border-color: #8b2500; }
+      button.generate-btn:hover { background: #c03500; }
+      button.random-btn { color: #b5a78a; border-color: #6b5240; }
+      button.random-btn:hover { color: #e07040; border-color: #e07040; }
+      .palette-toggle span { color: #b5a78a; }
+      .palette-toggle label { color: #b5a78a; border-color: #6b5240; }
+      .palette-toggle label:hover { color: #e07040; border-color: #e07040; }
+      .palette-toggle input[type="radio"]:checked + label { background: #a52d00; border-color: #8b2500; color: #f0e8d0; }
+      .username-label { color: #e0d8c0; }
+      .username-label span { color: #e07040; }
+      #tartan-display { border-color: #6b5240; background: #2a2a40; }
+      .sett-display h3 { color: #e0d8c0; }
+      .sett-swatch { border-color: #6b5240; }
+      .sett-label { color: #b5a78a; }
+      .sett-thread-count { color: #b5a78a; }
+      .share-links span { color: #b5a78a; }
+      .share-links a { color: #b5a78a; border-color: #6b5240; }
+      .share-links a:hover { color: #e07040; border-color: #e07040; background: rgba(224,112,64,0.06); }
+      button.download-btn { background: #1a472a; border-color: #0e3320; }
+      button.download-btn:hover { background: #2d5a27; }
+      button.bagpipe-btn { background: #5b2c6f; border-color: #3d1a4a; }
+      button.bagpipe-btn:hover { background: #7d3c98; }
+      button.download-bagpipe-btn { background: #4a1a5e; border-color: #3d1a4a; }
+      button.download-bagpipe-btn:hover { background: #6b2d8a; }
+      .gallery-section h2 { color: #f0e8d0; }
+      .gallery-section p.gallery-subtitle { color: #b5a78a; }
+      .gallery-card { border-color: #6b5240; background: #2a2a40; }
+      .gallery-card:hover { border-color: #e07040; }
+      .gallery-loading { color: #b5a78a; }
+      .gallery-loading .spinner { border-color: #6b5240; border-top-color: #e07040; }
+      footer { color: #6b5240; }
+      footer a { color: #6b5240; }
+      .input-error { color: #e07040; }
+      :focus-visible { outline-color: #e07040; }
+      .skip-link { background: #e07040; color: #1a1a2e; }
+    }
   </style>
 </head>
 <!-- If you're reading this, you're the kind of person who views source. We like you. -->
 <body>
+  <a href="#tartan-form" class="skip-link">Skip to content</a>
   <header>
     <a href="https://leereilly.net/dev-tartan" class="invertocat-wrap" id="invertocat-link" aria-label="Dev Tartan home">
       <svg id="invertocat-svg" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
@@ -631,7 +784,10 @@
     <label for="username">GitHub Username:</label>
     <input type="text" id="username" placeholder="e.g. octocat" autocomplete="off" required aria-label="GitHub username">
     <button type="submit" class="generate-btn" id="generate-btn">Weave Tartan</button>
+    <button type="button" class="random-btn" id="random-btn" aria-label="Generate a random tartan">🎲 Surprise Me</button>
   </form>
+
+  <div class="input-error" id="input-error" role="alert">Please enter a GitHub username.</div>
 
   <div class="palette-toggle" id="palette-toggle">
     <span>Palette:</span>
@@ -643,9 +799,9 @@
     <label for="palette-microsoft">Microsoft</label>
   </div>
 
-  <div class="username-label" id="username-label">The tartan of <span id="display-name"></span><img class="avatar" id="user-avatar" src="" alt="" style="display:none;"></div>
+  <div class="username-label" id="username-label">The tartan of <span id="display-name"></span><img class="avatar" id="user-avatar" src="" alt="GitHub avatar" style="display:none;"></div>
 
-  <div class="tartan-container">
+  <div class="tartan-container" aria-live="polite">
     <svg id="tartan-display" width="500" height="500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Generated tartan pattern"></svg>
   </div>
 
@@ -1628,7 +1784,7 @@
       // Loading state
       const genBtn = document.getElementById('generate-btn');
       const origBtnText = genBtn.textContent;
-      genBtn.textContent = 'Weaving…';
+      genBtn.innerHTML = '<span class="btn-spinner"></span>Weaving…';
       genBtn.disabled = true;
 
       // Check if this is a real clan name with a traditional tartan
@@ -1670,7 +1826,7 @@
         avatar.style.display = 'none';
       } else {
         avatar.src = `https://github.com/${encodeURIComponent(username)}.png?size=56`;
-        avatar.alt = username;
+        avatar.alt = `${username}'s GitHub avatar`;
         avatar.style.display = 'inline';
         avatar.onerror = function() { this.style.display = 'none'; };
       }
@@ -2312,21 +2468,65 @@
     // Event listeners
     document.getElementById('tartan-form').addEventListener('submit', (e) => {
       e.preventDefault();
-      const username = document.getElementById('username').value.trim().replace(/^@/, '');
+      const input = document.getElementById('username');
+      const username = input.value.trim().replace(/^@/, '');
+      const errorEl = document.getElementById('input-error');
+      if (!username) {
+        errorEl.style.display = 'block';
+        input.focus();
+        return;
+      }
+      errorEl.style.display = 'none';
+      const url = new URL(window.location);
+      url.searchParams.set('username', username);
+      if (currentPalette !== 'traditional') {
+        url.searchParams.set('palette', currentPalette);
+      } else {
+        url.searchParams.delete('palette');
+      }
+      url.hash = '';
+      window.history.pushState({ username, palette: currentPalette }, '', url);
+      generateTartan(username);
+      document.getElementById('gallery-section').classList.add('hidden');
+    });
+
+    // Back/forward navigation
+    window.addEventListener('popstate', (e) => {
+      const params = new URLSearchParams(window.location.search);
+      const username = (params.get('username') || '').trim().replace(/^@/, '');
       if (username) {
-        // Update URL with query parameter (no page reload)
-        const url = new URL(window.location);
-        url.searchParams.set('username', username);
-        if (currentPalette !== 'traditional') {
-          url.searchParams.set('palette', currentPalette);
-        } else {
-          url.searchParams.delete('palette');
+        const palette = (params.get('palette') || 'traditional').toLowerCase();
+        if (PALETTES[palette]) {
+          currentPalette = palette;
+          TARTAN_PALETTE = PALETTES[palette];
+          document.getElementById('palette-' + palette).checked = true;
         }
-        url.hash = '';
-        window.history.replaceState({}, '', url);
+        document.getElementById('username').value = username;
         generateTartan(username);
         document.getElementById('gallery-section').classList.add('hidden');
+      } else {
+        resetToHome();
       }
+    });
+
+    // Hide error on input
+    document.getElementById('username').addEventListener('input', () => {
+      document.getElementById('input-error').style.display = 'none';
+    });
+
+    // Random username
+    const RANDOM_USERNAMES = [
+      'octocat', 'mojombo', 'defunkt', 'matz', 'tenderlove', 'mrdoob',
+      'tj', 'sindresorhus', 'addyosmani', 'yyx990803', 'gaearon',
+      'antirez', 'mitchellh', 'rauchg', 'natfriedman', 'dhh',
+      'fabpot', 'jeresig', 'mitsuhiko', 'kennethreitz', 'tpope',
+      'pengwynn', 'holman', 'jashkenas', 'fat', 'wycats'
+    ];
+    document.getElementById('random-btn').addEventListener('click', () => {
+      const pick = RANDOM_USERNAMES[Math.floor(Math.random() * RANDOM_USERNAMES.length)];
+      document.getElementById('username').value = pick;
+      document.getElementById('input-error').style.display = 'none';
+      document.getElementById('tartan-form').dispatchEvent(new Event('submit', { cancelable: true }));
     });
 
     // Logo click: reset to home / gallery view
@@ -2445,7 +2645,7 @@
       card.setAttribute('aria-label', `View tartan for ${username}`);
       card.innerHTML = parts.join('') +
         `<div class="card-info">` +
-        `<img class="card-avatar" src="${avatarUrl}&s=44" alt="" loading="lazy" onerror="this.style.display='none'">` +
+        `<img class="card-avatar" src="${avatarUrl}&s=44" alt="${username}'s avatar" loading="lazy" onerror="this.style.display='none'">` +
         `<span class="card-username">${username}</span>` +
         `</div>`;
 
