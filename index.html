@@ -572,7 +572,7 @@
 <!-- If you're reading this, you're the kind of person who views source. We like you. -->
 <body>
   <header>
-    <div class="invertocat-wrap">
+    <a href="https://leereilly.net/dev-tartan" class="invertocat-wrap" id="invertocat-link" aria-label="Dev Tartan home">
       <svg id="invertocat-svg" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <clipPath id="octocat-clip">
@@ -584,7 +584,7 @@
         </defs>
         <rect width="16" height="16" clip-path="url(#octocat-clip)" fill="url(#octocat-tartan)"/>
       </svg>
-    </div>
+    </a>
     <h1><a href="#" id="logo-link">Dev <span class="accent">Tartan</span></a></h1>
     <div class="divider"></div>
     <p class="subtitle">Every developer deserves their own clan</p>
@@ -1646,6 +1646,9 @@
       // Use the tartan as a repeating background with high contrast (near-white)
       setTartanBackground(sett);
 
+      // Fill invertocat with the user's tartan
+      fillInvertocatWithSett(sett);
+
       // Update share links
       updateShareLinks(username);
 
@@ -2293,6 +2296,15 @@
     // Logo click: reset to home / gallery view
     document.getElementById('logo-link').addEventListener('click', (e) => {
       e.preventDefault();
+      resetToHome();
+    });
+
+    document.getElementById('invertocat-link').addEventListener('click', (e) => {
+      e.preventDefault();
+      resetToHome();
+    });
+
+    function resetToHome() {
       // Clear generated tartan state
       document.getElementById('tartan-display').style.display = 'none';
       document.getElementById('secondary-actions').style.display = 'none';
@@ -2312,8 +2324,10 @@
       document.title = 'Dev Tartan — Generate a Unique Tartan from Your GitHub Username';
       // Reset background
       document.body.style.backgroundImage = '';
+      // Re-randomize invertocat tartan
+      fillInvertocatRandom();
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+    }
 
     document.getElementById('download-btn').addEventListener('click', downloadSVG);
 
@@ -2610,7 +2624,7 @@
     })();
 
     // ── Invertocat random tartan fill ────────────────────────────────
-    (function fillInvertocatTartan() {
+    function fillInvertocatRandom() {
       const pat = document.getElementById('octocat-tartan');
       if (!pat) return;
       const palette = PALETTES.traditional;
@@ -2679,7 +2693,51 @@
           y += st.width;
         }
       }
-    })();
+    }
+    fillInvertocatRandom();
+
+    // Fill the invertocat with a specific tartan sett (called after generation)
+    function fillInvertocatWithSett(sett) {
+      const pat = document.getElementById('octocat-tartan');
+      if (!pat) return;
+      const size = 16;
+      pat.setAttribute('width', size);
+      pat.setAttribute('height', size);
+      pat.innerHTML = '';
+
+      const mirror = expandSett(sett);
+      const total = mirror.reduce((s, st) => s + st.width, 0);
+      if (total === 0) return;
+      const scale = size / total;
+
+      const bg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      bg.setAttribute('width', size);
+      bg.setAttribute('height', size);
+      bg.setAttribute('fill', sett[0].color);
+      pat.appendChild(bg);
+
+      let x = 0;
+      for (let rep = 0; rep < 3; rep++) {
+        for (const st of mirror) {
+          const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          r.setAttribute('x', x * scale); r.setAttribute('y', 0);
+          r.setAttribute('width', st.width * scale); r.setAttribute('height', size);
+          r.setAttribute('fill', st.color); r.setAttribute('opacity', '0.7');
+          pat.appendChild(r); x += st.width;
+        }
+      }
+
+      let y = 0;
+      for (let rep = 0; rep < 3; rep++) {
+        for (const st of mirror) {
+          const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+          r.setAttribute('x', 0); r.setAttribute('y', y * scale);
+          r.setAttribute('width', size); r.setAttribute('height', st.width * scale);
+          r.setAttribute('fill', st.color); r.setAttribute('opacity', '0.5');
+          pat.appendChild(r); y += st.width;
+        }
+      }
+    }
   </script>
   <!--
        _
