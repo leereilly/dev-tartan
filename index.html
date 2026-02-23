@@ -469,6 +469,44 @@
       border: 1.5px solid #8b774b;
     }
 
+    .easter-egg-msg {
+      display: none;
+      padding: 1rem 1.25rem;
+      font-family: 'Mona Sans', sans-serif;
+      font-style: italic;
+      font-size: 0.95rem;
+      color: #3d2b1f;
+      text-align: left;
+      width: 80%;
+      max-width: 480px;
+      position: absolute;
+      top: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      background: #f4edd3;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .easter-egg-msg::after {
+      content: '';
+      position: absolute;
+      top: -10px;
+      right: 50%;
+      margin-right: -140px;
+      border-width: 0 10px 10px;
+      border-style: solid;
+      border-color: transparent transparent #f4edd3;
+    }
+    .easter-egg-msg .eq-attr {
+      display: block;
+      margin-top: 0.5rem;
+      font-style: normal;
+      font-weight: 700;
+      font-size: 0.8rem;
+      color: #8b774b;
+    }
+
     footer {
       margin-top: auto;
       padding-top: 2rem;
@@ -759,6 +797,9 @@
     body.dark-mode .palette-toggle input[type="radio"]:checked + label { background: #a52d00; border-color: #8b2500; color: #f0e8d0; }
     body.dark-mode .username-label { color: #e0d8c0; }
     body.dark-mode .username-label span { color: #e07040; }
+    body.dark-mode .easter-egg-msg { color: #1c2541; background: #e0d8c0; }
+    body.dark-mode .easter-egg-msg::after { border-color: transparent transparent #e0d8c0; }
+    body.dark-mode .easter-egg-msg .eq-attr { color: #5a4a2a; }
     body.dark-mode #tartan-display { border-color: #6b5240; background: #2a2a40; }
     body.dark-mode .sett-display h3 { color: #e0d8c0; }
     body.dark-mode .sett-swatch { border-color: #6b5240; }
@@ -838,8 +879,9 @@
 
   <div class="username-label" id="username-label">The tartan of <span id="display-name"></span><img class="avatar" id="user-avatar" src="" alt="GitHub avatar" style="display:none;"></div>
 
-  <div class="tartan-container" aria-live="polite">
+  <div class="tartan-container" aria-live="polite" style="position:relative;">
     <svg id="tartan-display" width="500" height="500" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Generated tartan pattern"></svg>
+    <div class="easter-egg-msg" id="easter-egg-msg"></div>
   </div>
 
   <div class="secondary-actions" id="secondary-actions">
@@ -1871,6 +1913,15 @@
         avatar.onerror = function() { this.style.display = 'none'; };
       }
 
+      // Easter egg
+      const easterEggEl = document.getElementById('easter-egg-msg');
+      if (username.toLowerCase() === 'adamahata') {
+        easterEggEl.innerHTML = '\u201CBut do they call me Adam, VP of Brand and Marketing?!?<br>Oh no. No. But if you fork one forking █████ !<span class="eq-attr"> @adamahata</span>';
+        easterEggEl.style.display = 'block';
+      } else {
+        easterEggEl.style.display = 'none';
+      }
+
       displaySett(sett);
 
       // Draw the character wearing the tartan kilt (personalized via hash)
@@ -2575,6 +2626,7 @@
       document.getElementById('sett-display').style.display = 'none';
       document.getElementById('character-container').style.display = 'none';
       document.getElementById('share-links').style.display = 'none';
+      document.getElementById('easter-egg-msg').style.display = 'none';
       document.getElementById('username').value = '';
       // Show gallery again
       document.getElementById('gallery-section').classList.remove('hidden');
