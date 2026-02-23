@@ -2882,8 +2882,9 @@
           return '⚔️  Clan ' + username + ' recognized.';
         },
 
-        tartan: function() {
-          if (!_lastSett) {
+        tartan: function(sett) {
+          var theSett = sett || _lastSett;
+          if (!theSett) {
             console.log('%c🤷 Generate a tartan first, then call devTartan.tartan()', 'color: #c41e3a;');
             return;
           }
@@ -2892,7 +2893,7 @@
           var canvas = document.createElement('canvas');
           canvas.width = size; canvas.height = size;
           var ctx = canvas.getContext('2d');
-          var sym = expandSett(_lastSett);
+          var sym = expandSett(theSett);
           var rw = sym.reduce(function(s, t) { return s + t.width; }, 0);
           if (!rw) return;
           var sc = size / (rw * 3);
@@ -2969,6 +2970,19 @@
           return '📖 Available commands listed above.';
         }
       };
+
+      // Auto-render tartan in console on page load
+      // Default "Dev Tartan house tartan" sett for when no username is active
+      var _houseSett = [
+        { color: { hex: '#c80000' }, width: 14 },
+        { color: { hex: '#003366' }, width: 8 },
+        { color: { hex: '#006400' }, width: 18 },
+        { color: { hex: '#ffd700' }, width: 4 },
+        { color: { hex: '#101010' }, width: 6 }
+      ];
+      setTimeout(function() {
+        window.devTartan.tartan(_lastSett || _houseSett);
+      }, 400);
     })();
 
     // ── Invertocat random tartan fill ────────────────────────────────
