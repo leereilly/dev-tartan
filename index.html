@@ -2982,7 +2982,7 @@
         { color: { hex: '#101010' }, width: 6 }
       ];
       setTimeout(function() {
-        window.devTartan.tartan(_lastSett || _houseSett);
+        if (!_lastSett) window.devTartan.tartan(_houseSett);
       }, 400);
     })();
 
