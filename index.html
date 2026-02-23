@@ -1842,6 +1842,7 @@
       const svg = document.getElementById('tartan-display');
       renderTartan(svg, sett);
       _lastSett = sett; // stash for console easter egg
+      if (window.devTartan) window.devTartan.tartan();
 
       svg.style.display = 'block';
       document.getElementById('secondary-actions').style.display = 'flex';
