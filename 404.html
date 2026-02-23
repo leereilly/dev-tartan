@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — Tartan Couldae Be Found!</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231c2541'/%3E%3Crect x='0' y='6' width='32' height='4' fill='%238b1a1a' opacity='0.8'/%3E%3Crect x='0' y='22' width='32' height='4' fill='%238b1a1a' opacity='0.8'/%3E%3Crect x='6' y='0' width='4' height='32' fill='%231a472a' opacity='0.8'/%3E%3Crect x='22' y='0' width='4' height='32' fill='%231a472a' opacity='0.8'/%3E%3Crect x='14' y='0' width='2' height='32' fill='%23c5a041' opacity='0.6'/%3E%3Crect x='0' y='14' width='32' height='2' fill='%23c5a041' opacity='0.6'/%3E%3C/svg%3E">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      background-color: #1c2541;
+      background-repeat: repeat;
+      transition: background-image 0.5s ease;
+      overflow: hidden;
+    }
+    h1 {
+      font-size: clamp(8rem, 20vw, 16rem);
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 4px 24px rgba(0,0,0,0.5);
+      line-height: 1;
+    }
+    p {
+      font-size: clamp(1.2rem, 3vw, 2rem);
+      color: #fff;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+      margin-top: 0.5em;
+    }
+    a {
+      margin-top: 1.5em;
+      padding: 0.6em 1.8em;
+      color: #fff;
+      font-size: 1.1rem;
+      text-decoration: none;
+      border: 2px solid #fff;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+    a:hover { background: rgba(255,255,255,0.15); }
+  </style>
+</head>
+<body>
+  <h1>404</h1>
+  <p>Tartan couldae be found!</p>
+  <a href="javascript:history.back()">← Go Back</a>
+
+  <script>
+    const TARTAN_COLORS = {
+      BK: '#101010', B: '#003366', G: '#006400', R: '#c80000',
+      Y: '#ffd700', W: '#ffffff', AZ: '#5b97b0', CR: '#dc143c',
+      PU: '#6a2c8b', GY: '#808080', BR: '#6b3a2a', LG: '#86c67c',
+      Or: '#ec8048', Mn: '#800020', DB: '#00008c',
+    };
+
+    const SETTS = [
+      'G 28 W 2 G 14 BK 14 B 4 BK 4 B 4 BK 4 B 14',
+      'R 6 AZ 12 R 2 BK 4 R 2 AZ 36 BK 6 W 6 BK 6 Y 2 BK 2 Y 2 BK 8 R 2 B 8 R 6 G 12 R 4 G 12 R 8',
+      'G 4 BK 2 G 60 BK 24 B 4 BK 2 B 2 BK 2 B 24 R 6',
+      'PU 6 G 2 PU 2 G 16 BK 16 B 16 BK 4 B 6',
+      'R 2 G 32 B 32 G 2',
+      'B 22 BK 2 B 2 BK 2 B 2 BK 16 G 16 BK 2 G 16 BK 16 B 16 BK 2 B 2 G 10 BK 2 G 10 BK 8 DB 9 BK 1 DB 1',
+      'R 96 W 8 B 8 BK 8 R 24 B 8 R 2 Y 8',
+      'W 2 R 16 G 4 R 4 G 12 R 2 G 12 R 4 G 4 R 16 Y 2',
+      'BK 2 Y 12 BK 2 B 8 BK 2 G 12 B 8 G 12 BK 2 B 8 BK 2 R 16 W 2 R 16 BK 2 B 8 BK 2 Y 12',
+      'Y 2 R 32 G 12 R 4 G 12 R 4',
+      'B 22 BK 2 B 2 BK 2 B 2 BK 16 G 16 BK 2 G 16 BK 16 B 16 BK 2 B 2',
+      'R 24 PU 4 W 2 PU 4 R 6 G 16 R 6 PU 2',
+      'AZ 24 BK 8 G 8 BK 8 R 24',
+      'B 2 BK 2 B 16 BK 16 W 2 G 16 R 4',
+      'CR 12 W 4 CR 60 G 24 CR 6 G 24 CR 6',
+      'R 72 W 2 B 6 Y 2 G 32 R 16 B 6 AZ 4 W 2',
+      'R 72 B 8 BK 12 Y 2 BK 2 W 2 BK 2 G 16 R 8 BK 2 R 4 W 2',
+      'R 4 G 6 BK 6 G 96 BK 48 B 16 BK 6 B 6 BK 6 B 48 W 4 B 8',
+      'BK 2 R 16 BK 16 Y 2',
+      'BK 8 R 8',
+      'R 10 AZ 4 W 2 G 10 R 10',
+      'R 4 B 8 BK 2 B 2 BK 2 B 2 BK 16 G 16 Y 4 G 16 BK 16 B 16 BK 2 R 4',
+      'B 48 BK 16 G 16 R 4 G 16 BK 2 W 4',
+      'B 32 R 2 B 2 R 2 G 24 R 32 G 4 R 32 G 24 B 24 R 2 B 2',
+      'B 24 BK 4 B 4 BK 4 B 4 BK 24 G 24 Y 4 G 24 BK 24 B 22 BK 4 B 4',
+      'R 8 G 8 R 2 B 8 R 8',
+      'G 16 R 2 G 4 R 6 G 24 BK 24 R 2 B 24 R 6 B 4 R 2 B 16',
+      'R 72 G 36 R 8 G 12 BK 2 W 4',
+      'W 2 R 18 B 12 R 2 B 12',
+      'Y 6 G 60 BK 24 G 12 BK 64',
+      'B 6 BK 2 B 2 BK 2 B 2 BK 8 G 8 W 2 G 8 BK 8 B 8 BK 2 B 2',
+      'R 48 B 12 R 6 G 24 R 8 B 2',
+      'R 2 BK 2 W 2 R 24 AZ 8 BK 2 AZ 2 BK 2 AZ 8 BK 12 Y 2 G 16 R 24 AZ 4 R 24',
+      'B 12 BK 2 B 2 BK 2 B 2 BK 12 G 12 R 4 G 12 BK 12 B 12 BK 2 B 4',
+      'R 6 G 2 R 56 BK 12 R 8 G 32 R 6',
+      'G 8 R 6 BK 2 R 56 G 28 R 8 G 8 W 6 G 8 R 8',
+      'R 60 G 24 BK 10 W 4 AZ 12 R 60',
+      'G 12 W 4 G 48 BK 24 B 6 BK 4 B 4 BK 4 B 24 R 2 B 2 R 6',
+      'G 4 B 14 BK 2 B 2 BK 2 B 2 BK 6 G 22 R 4 G 22 BK 6 G 4 BK 12 G 4 BK 12 G 4 BK 6 G 22 Y 4 G 22 BK 6 B 2 BK 2 B 2 BK 2 B 14 G 4',
+      'W 72 B 8 BK 12 Y 2 BK 2 W 2 BK 2 G 16 R 8 BK 2 R 4 W 2',
+    ];
+
+    function parseSett(str) {
+      const tokens = str.trim().split(/\s+/);
+      const sett = [];
+      for (let i = 0; i < tokens.length - 1; i += 2) {
+        const hex = TARTAN_COLORS[tokens[i]];
+        const w = parseInt(tokens[i + 1], 10);
+        if (hex && !isNaN(w)) sett.push({ hex, width: Math.max(2, Math.round(w / 2)) });
+      }
+      return sett;
+    }
+
+    function expandSett(sett) {
+      if (sett.length <= 1) return sett;
+      return [...sett, ...sett.slice(1, -1).reverse()];
+    }
+
+    function setBackground(sett) {
+      const tile = 200;
+      const sym = expandSett(sett);
+      const total = sym.reduce((s, v) => s + v.width, 0);
+      if (!total) return;
+      const sc = tile / total;
+      let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${tile}" height="${tile}">`;
+      svg += `<rect width="${tile}" height="${tile}" fill="${sett[0].hex}"/>`;
+      // Warp
+      svg += `<g opacity="0.85">`;
+      let x = 0;
+      for (const s of sym) { const w = s.width * sc; svg += `<rect x="${x}" y="0" width="${Math.ceil(w)}" height="${tile}" fill="${s.hex}"/>`; x += w; }
+      svg += `</g>`;
+      // Weft
+      svg += `<g opacity="0.55" style="mix-blend-mode:multiply">`;
+      let y = 0;
+      for (const s of sym) { const h = s.width * sc; svg += `<rect x="0" y="${y}" width="${tile}" height="${Math.ceil(h)}" fill="${s.hex}"/>`; y += h; }
+      svg += `</g></svg>`;
+      const uri = 'data:image/svg+xml,' + encodeURIComponent(svg);
+      document.body.style.backgroundImage = `url("${uri}")`;
+      document.body.style.backgroundSize = `${tile}px ${tile}px`;
+    }
+
+    let last = -1;
+    function randomTartan() {
+      let idx;
+      do { idx = Math.floor(Math.random() * SETTS.length); } while (idx === last);
+      last = idx;
+      setBackground(parseSett(SETTS[idx]));
+    }
+
+    randomTartan();
+    setInterval(randomTartan, 1000);
+  </script>
+</body>
+</html>
