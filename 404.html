@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>404 — Tartan Couldae Be Found!</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231c2541'/%3E%3Crect x='0' y='6' width='32' height='4' fill='%238b1a1a' opacity='0.8'/%3E%3Crect x='0' y='22' width='32' height='4' fill='%238b1a1a' opacity='0.8'/%3E%3Crect x='6' y='0' width='4' height='32' fill='%231a472a' opacity='0.8'/%3E%3Crect x='22' y='0' width='4' height='32' fill='%231a472a' opacity='0.8'/%3E%3Crect x='14' y='0' width='2' height='32' fill='%23c5a041' opacity='0.6'/%3E%3Crect x='0' y='14' width='32' height='2' fill='%23c5a041' opacity='0.6'/%3E%3C/svg%3E">
+  <title>404 — Page Not Found</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -13,143 +12,226 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      background: #f5f0e8;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-      background-color: #1c2541;
-      background-repeat: repeat;
-      transition: background-image 0.5s ease;
-      overflow: hidden;
     }
-    h1 {
-      font-size: clamp(8rem, 20vw, 16rem);
-      font-weight: 900;
-      color: #fff;
-      text-shadow: 0 4px 24px rgba(0,0,0,0.5);
-      line-height: 1;
-    }
-    p {
-      font-size: clamp(1.2rem, 3vw, 2rem);
-      color: #fff;
-      text-shadow: 0 2px 12px rgba(0,0,0,0.5);
-      margin-top: 0.5em;
-    }
+    #kilt-man { width: 340px; height: auto; }
+    #kilt-man .tartan-fill { transition: fill 0.5s ease; }
+    p { font-size: 1.2rem; color: #5a4a3a; margin-top: 0.6rem; }
     a {
-      margin-top: 1.5em;
-      padding: 0.6em 1.8em;
-      color: #fff;
-      font-size: 1.1rem;
+      margin-top: 1em;
+      padding: 0.5em 1.6em;
+      color: #2a1a0a;
+      font-size: 1rem;
       text-decoration: none;
-      border: 2px solid #fff;
+      border: 2px solid #2a1a0a;
       border-radius: 6px;
       transition: background 0.2s;
     }
-    a:hover { background: rgba(255,255,255,0.15); }
+    a:hover { background: rgba(0,0,0,0.08); }
+
+    /* ── Theme toggle button ─────────────────────────────── */
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+      background: rgba(44,24,16,0.08);
+      border: 2px solid rgba(139,119,75,0.3);
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      font-size: 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s, border-color 0.3s, transform 0.2s;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .theme-toggle:hover {
+      background: rgba(44,24,16,0.15);
+      border-color: rgba(139,119,75,0.5);
+      transform: scale(1.1);
+    }
+    .theme-toggle:active { transform: scale(0.95); }
+    .theme-toggle .icon-sun { display: inline; }
+    .theme-toggle .icon-moon { display: none; }
+    .dark-mode .theme-toggle {
+      background: rgba(240,232,208,0.1);
+      border-color: rgba(107,82,64,0.5);
+    }
+    .dark-mode .theme-toggle:hover {
+      background: rgba(240,232,208,0.2);
+      border-color: rgba(224,112,64,0.6);
+    }
+    .dark-mode .theme-toggle .icon-sun { display: none; }
+    .dark-mode .theme-toggle .icon-moon { display: inline; }
+
+    /* ── Dark mode ────────────────────────────────────────── */
+    body.dark-mode {
+      background: #1a1a2e;
+    }
+    body.dark-mode p { color: #b5a78a; }
+    body.dark-mode a { color: #e0d8c0; border-color: #6b5240; }
+    body.dark-mode a:hover { background: rgba(255,255,255,0.08); border-color: #e07040; color: #e07040; }
   </style>
 </head>
 <body>
-  <h1>404</h1>
-  <p>Tartan couldae be found!</p>
-  <a href="javascript:history.back()">← Go Back</a>
+  <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode" title="Toggle light/dark mode">
+    <span class="icon-sun">☀️</span>
+    <span class="icon-moon">🌙</span>
+  </button>
+
+  <svg id="kilt-man" viewBox="0 0 400 500" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <pattern id="tartan" width="32" height="32" patternUnits="userSpaceOnUse" patternTransform="rotate(2)">
+        <rect width="32" height="32" class="tartan-fill" id="t-base"/>
+        <rect x="0" width="7" height="32" class="tartan-fill" id="t-v1" opacity="0.75"/>
+        <rect x="16" width="3" height="32" class="tartan-fill" id="t-v2" opacity="0.5"/>
+        <rect x="26" width="1.5" height="32" class="tartan-fill" id="t-v3" opacity="0.4"/>
+        <rect y="0" width="32" height="7" class="tartan-fill" id="t-h1" opacity="0.55"/>
+        <rect y="16" width="32" height="3" class="tartan-fill" id="t-h2" opacity="0.4"/>
+        <rect y="26" width="32" height="1.5" class="tartan-fill" id="t-h3" opacity="0.35"/>
+      </pattern>
+      <filter id="drop-shadow">
+        <feDropShadow dx="1" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.15"/>
+      </filter>
+    </defs>
+
+    <!-- Shirt bottom peeking out -->
+    <rect x="160" y="0" width="80" height="16" rx="4" fill="#f8f8f5"/>
+
+    <!-- Belt -->
+    <rect x="148" y="16" width="104" height="24" rx="3" fill="#3a2518"/>
+    <rect x="148" y="16" width="104" height="5" rx="2" fill="#4a3528" opacity="0.4"/>
+    <rect x="190" y="19" width="20" height="18" rx="2" fill="#c8b070" stroke="#8a7040" stroke-width="1"/>
+    <rect x="197" y="22" width="6" height="12" rx="1" fill="#3a2518"/>
+
+    <!-- Kilt -->
+    <polygon points="148,40 252,40 280,232 120,232" fill="url(#tartan)"/>
+
+    <!-- Pleat folds -->
+    <line x1="170" y1="40" x2="148" y2="232" stroke="rgba(0,0,0,0.1)" stroke-width="1.5"/>
+    <line x1="188" y1="40" x2="174" y2="232" stroke="rgba(0,0,0,0.1)" stroke-width="1.5"/>
+    <line x1="200" y1="40" x2="200" y2="232" stroke="rgba(0,0,0,0.08)" stroke-width="1.5"/>
+    <line x1="212" y1="40" x2="226" y2="232" stroke="rgba(0,0,0,0.1)" stroke-width="1.5"/>
+    <line x1="230" y1="40" x2="252" y2="232" stroke="rgba(0,0,0,0.1)" stroke-width="1.5"/>
+
+    <!-- Kilt hem shadow -->
+    <line x1="124" y1="232" x2="276" y2="232" stroke="rgba(0,0,0,0.15)" stroke-width="2.5"/>
+
+    <!-- Sporran -->
+    <rect x="184" y="92" width="32" height="8" rx="3" fill="#c8b070"/>
+    <ellipse cx="200" cy="122" rx="22" ry="28" fill="#1a0e04"/>
+    <ellipse cx="200" cy="116" rx="18" ry="16" fill="#2a1a0a"/>
+    <line x1="192" y1="126" x2="189" y2="148" stroke="#c8b070" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="200" y1="128" x2="200" y2="152" stroke="#c8b070" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="208" y1="126" x2="211" y2="148" stroke="#c8b070" stroke-width="1.5" stroke-linecap="round"/>
+
+    <!-- Left thigh (skin, angled outward in squat) -->
+    <path d="M125,225 C100,262 70,298 44,332 C40,348 58,354 70,344 C92,312 114,270 150,232 Z" fill="#d4a574"/>
+    <ellipse cx="58" cy="330" rx="10" ry="8" fill="#dbb08a" opacity="0.4" transform="rotate(-15,58,330)"/>
+
+    <!-- Right thigh (skin, angled outward in squat) -->
+    <path d="M275,225 C300,262 330,298 356,332 C360,348 342,354 330,344 C308,312 286,270 250,232 Z" fill="#d4a574"/>
+    <ellipse cx="342" cy="330" rx="10" ry="8" fill="#dbb08a" opacity="0.4" transform="rotate(15,342,330)"/>
+
+    <!-- Left sock -->
+    <path d="M40,338 C34,368 32,402 44,442 L74,442 C74,406 76,370 72,342 Z" fill="#f5f5f0" stroke="#ddd8d0" stroke-width="1"/>
+    <path d="M40,338 Q44,348 56,350 Q68,348 72,342 Q68,346 56,347 Q44,346 40,338 Z" fill="#e8e4dc"/>
+    <line x1="38" y1="360" x2="73" y2="358" stroke="#e8e4dc" stroke-width="0.8"/>
+    <line x1="36" y1="380" x2="74" y2="378" stroke="#e8e4dc" stroke-width="0.8"/>
+    <line x1="35" y1="400" x2="74" y2="398" stroke="#e8e4dc" stroke-width="0.8"/>
+    <line x1="37" y1="420" x2="74" y2="418" stroke="#e8e4dc" stroke-width="0.8"/>
+
+    <!-- Sgian-dubh in left sock -->
+    <rect x="68" y="340" width="5" height="16" rx="1.5" fill="#2a1a0a" transform="rotate(5,70,348)"/>
+    <rect x="69" y="338" width="3" height="5" rx="1" fill="#c8b070" transform="rotate(5,70,340)"/>
+
+    <!-- Right sock -->
+    <path d="M328,342 C324,370 326,406 338,442 L368,442 C378,406 380,370 374,338 Z" fill="#f5f5f0" stroke="#ddd8d0" stroke-width="1"/>
+    <path d="M374,338 Q370,348 358,350 Q346,348 328,342 Q346,346 358,347 Q370,346 374,338 Z" fill="#e8e4dc"/>
+    <line x1="330" y1="362" x2="376" y2="360" stroke="#e8e4dc" stroke-width="0.8"/>
+    <line x1="330" y1="382" x2="376" y2="380" stroke="#e8e4dc" stroke-width="0.8"/>
+    <line x1="332" y1="402" x2="374" y2="400" stroke="#e8e4dc" stroke-width="0.8"/>
+    <line x1="334" y1="422" x2="372" y2="420" stroke="#e8e4dc" stroke-width="0.8"/>
+
+    <!-- Left shoe -->
+    <path d="M18,438 L80,438 Q90,440 90,450 L88,462 Q86,472 76,472 L22,472 Q12,472 12,462 L14,450 Q16,440 22,438 Z" fill="#2a1508"/>
+    <ellipse cx="52" cy="445" rx="24" ry="4" fill="#3a2518" opacity="0.5"/>
+    <path d="M28,450 Q38,444 48,450" stroke="#4a3528" stroke-width="1" fill="none"/>
+    <path d="M48,450 Q58,444 68,450" stroke="#4a3528" stroke-width="1" fill="none"/>
+    <rect x="12" y="468" width="78" height="4" rx="2" fill="#1a0a00"/>
+
+    <!-- Right shoe -->
+    <path d="M320,438 L382,438 Q392,440 392,450 L390,462 Q388,472 378,472 L324,472 Q314,472 314,462 L316,450 Q318,440 324,438 Z" fill="#2a1508"/>
+    <ellipse cx="354" cy="445" rx="24" ry="4" fill="#3a2518" opacity="0.5"/>
+    <path d="M332,450 Q342,444 352,450" stroke="#4a3528" stroke-width="1" fill="none"/>
+    <path d="M352,450 Q362,444 372,450" stroke="#4a3528" stroke-width="1" fill="none"/>
+    <rect x="314" y="468" width="78" height="4" rx="2" fill="#1a0a00"/>
+
+    <!-- Stink lines rising from under kilt -->
+    <path d="M182,268 C179,256 184,246 181,234" stroke="#9a8a6a" stroke-width="1.5" fill="none" opacity="0.18" stroke-linecap="round"/>
+    <path d="M200,264 C197,250 203,240 200,228" stroke="#9a8a6a" stroke-width="1.5" fill="none" opacity="0.14" stroke-linecap="round"/>
+    <path d="M218,268 C215,256 220,246 217,234" stroke="#9a8a6a" stroke-width="1.5" fill="none" opacity="0.18" stroke-linecap="round"/>
+
+    <!-- Motion lines (404 dropping) -->
+    <line x1="172" y1="244" x2="172" y2="258" stroke="#9a8a6a" stroke-width="1.5" opacity="0.18" stroke-linecap="round"/>
+    <line x1="200" y1="240" x2="200" y2="256" stroke="#9a8a6a" stroke-width="1.5" opacity="0.14" stroke-linecap="round"/>
+    <line x1="228" y1="242" x2="228" y2="258" stroke="#9a8a6a" stroke-width="1.5" opacity="0.18" stroke-linecap="round"/>
+
+    <!-- 404 tumbling out from under the kilt -->
+    <g filter="url(#drop-shadow)">
+      <text x="158" y="302" font-family="Georgia, 'Times New Roman', serif" font-size="54" font-weight="900" fill="#5a4030" transform="rotate(-10,158,302)">4</text>
+      <text x="188" y="320" font-family="Georgia, 'Times New Roman', serif" font-size="54" font-weight="900" fill="#5a4030" transform="rotate(4,188,320)">0</text>
+      <text x="222" y="308" font-family="Georgia, 'Times New Roman', serif" font-size="54" font-weight="900" fill="#5a4030" transform="rotate(12,222,308)">4</text>
+      <animateTransform attributeName="transform" type="translate" values="0,0;0,3;0,0" dur="2s" repeatCount="indefinite"/>
+    </g>
+
+    <!-- Ground shadow -->
+    <ellipse cx="200" cy="478" rx="200" ry="10" fill="rgba(0,0,0,0.06)"/>
+  </svg>
+
+  <p>Page not found</p>
+  <a href="/">← Home</a>
 
   <script>
-    const TARTAN_COLORS = {
-      BK: '#101010', B: '#003366', G: '#006400', R: '#c80000',
-      Y: '#ffd700', W: '#ffffff', AZ: '#5b97b0', CR: '#dc143c',
-      PU: '#6a2c8b', GY: '#808080', BR: '#6b3a2a', LG: '#86c67c',
-      Or: '#ec8048', Mn: '#800020', DB: '#00008c',
-    };
-
-    const SETTS = [
-      'G 28 W 2 G 14 BK 14 B 4 BK 4 B 4 BK 4 B 14',
-      'R 6 AZ 12 R 2 BK 4 R 2 AZ 36 BK 6 W 6 BK 6 Y 2 BK 2 Y 2 BK 8 R 2 B 8 R 6 G 12 R 4 G 12 R 8',
-      'G 4 BK 2 G 60 BK 24 B 4 BK 2 B 2 BK 2 B 24 R 6',
-      'PU 6 G 2 PU 2 G 16 BK 16 B 16 BK 4 B 6',
-      'R 2 G 32 B 32 G 2',
-      'B 22 BK 2 B 2 BK 2 B 2 BK 16 G 16 BK 2 G 16 BK 16 B 16 BK 2 B 2 G 10 BK 2 G 10 BK 8 DB 9 BK 1 DB 1',
-      'R 96 W 8 B 8 BK 8 R 24 B 8 R 2 Y 8',
-      'W 2 R 16 G 4 R 4 G 12 R 2 G 12 R 4 G 4 R 16 Y 2',
-      'BK 2 Y 12 BK 2 B 8 BK 2 G 12 B 8 G 12 BK 2 B 8 BK 2 R 16 W 2 R 16 BK 2 B 8 BK 2 Y 12',
-      'Y 2 R 32 G 12 R 4 G 12 R 4',
-      'B 22 BK 2 B 2 BK 2 B 2 BK 16 G 16 BK 2 G 16 BK 16 B 16 BK 2 B 2',
-      'R 24 PU 4 W 2 PU 4 R 6 G 16 R 6 PU 2',
-      'AZ 24 BK 8 G 8 BK 8 R 24',
-      'B 2 BK 2 B 16 BK 16 W 2 G 16 R 4',
-      'CR 12 W 4 CR 60 G 24 CR 6 G 24 CR 6',
-      'R 72 W 2 B 6 Y 2 G 32 R 16 B 6 AZ 4 W 2',
-      'R 72 B 8 BK 12 Y 2 BK 2 W 2 BK 2 G 16 R 8 BK 2 R 4 W 2',
-      'R 4 G 6 BK 6 G 96 BK 48 B 16 BK 6 B 6 BK 6 B 48 W 4 B 8',
-      'BK 2 R 16 BK 16 Y 2',
-      'BK 8 R 8',
-      'R 10 AZ 4 W 2 G 10 R 10',
-      'R 4 B 8 BK 2 B 2 BK 2 B 2 BK 16 G 16 Y 4 G 16 BK 16 B 16 BK 2 R 4',
-      'B 48 BK 16 G 16 R 4 G 16 BK 2 W 4',
-      'B 32 R 2 B 2 R 2 G 24 R 32 G 4 R 32 G 24 B 24 R 2 B 2',
-      'B 24 BK 4 B 4 BK 4 B 4 BK 24 G 24 Y 4 G 24 BK 24 B 22 BK 4 B 4',
-      'R 8 G 8 R 2 B 8 R 8',
-      'G 16 R 2 G 4 R 6 G 24 BK 24 R 2 B 24 R 6 B 4 R 2 B 16',
-      'R 72 G 36 R 8 G 12 BK 2 W 4',
-      'W 2 R 18 B 12 R 2 B 12',
-      'Y 6 G 60 BK 24 G 12 BK 64',
-      'B 6 BK 2 B 2 BK 2 B 2 BK 8 G 8 W 2 G 8 BK 8 B 8 BK 2 B 2',
-      'R 48 B 12 R 6 G 24 R 8 B 2',
-      'R 2 BK 2 W 2 R 24 AZ 8 BK 2 AZ 2 BK 2 AZ 8 BK 12 Y 2 G 16 R 24 AZ 4 R 24',
-      'B 12 BK 2 B 2 BK 2 B 2 BK 12 G 12 R 4 G 12 BK 12 B 12 BK 2 B 4',
-      'R 6 G 2 R 56 BK 12 R 8 G 32 R 6',
-      'G 8 R 6 BK 2 R 56 G 28 R 8 G 8 W 6 G 8 R 8',
-      'R 60 G 24 BK 10 W 4 AZ 12 R 60',
-      'G 12 W 4 G 48 BK 24 B 6 BK 4 B 4 BK 4 B 24 R 2 B 2 R 6',
-      'G 4 B 14 BK 2 B 2 BK 2 B 2 BK 6 G 22 R 4 G 22 BK 6 G 4 BK 12 G 4 BK 12 G 4 BK 6 G 22 Y 4 G 22 BK 6 B 2 BK 2 B 2 BK 2 B 14 G 4',
-      'W 72 B 8 BK 12 Y 2 BK 2 W 2 BK 2 G 16 R 8 BK 2 R 4 W 2',
-    ];
-
-    function parseSett(str) {
-      const tokens = str.trim().split(/\s+/);
-      const sett = [];
-      for (let i = 0; i < tokens.length - 1; i += 2) {
-        const hex = TARTAN_COLORS[tokens[i]];
-        const w = parseInt(tokens[i + 1], 10);
-        if (hex && !isNaN(w)) sett.push({ hex, width: Math.max(2, Math.round(w / 2)) });
-      }
-      return sett;
+    function randHSL(s, lMin, lMax) {
+      const h = Math.floor(Math.random() * 360);
+      const l = lMin + Math.floor(Math.random() * (lMax - lMin));
+      return `hsl(${h}, ${s}%, ${l}%)`;
     }
 
-    function expandSett(sett) {
-      if (sett.length <= 1) return sett;
-      return [...sett, ...sett.slice(1, -1).reverse()];
+    function changeTartan() {
+      const base = randHSL(55, 25, 45);
+      const stripe1 = randHSL(60, 20, 40);
+      const stripe2 = randHSL(50, 50, 70);
+
+      document.getElementById('t-base').setAttribute('fill', base);
+      document.getElementById('t-v1').setAttribute('fill', stripe1);
+      document.getElementById('t-h1').setAttribute('fill', stripe1);
+      document.getElementById('t-v2').setAttribute('fill', stripe2);
+      document.getElementById('t-h2').setAttribute('fill', stripe2);
+      document.getElementById('t-v3').setAttribute('fill', stripe1);
+      document.getElementById('t-h3').setAttribute('fill', stripe1);
     }
 
-    function setBackground(sett) {
-      const tile = 200;
-      const sym = expandSett(sett);
-      const total = sym.reduce((s, v) => s + v.width, 0);
-      if (!total) return;
-      const sc = tile / total;
-      let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${tile}" height="${tile}">`;
-      svg += `<rect width="${tile}" height="${tile}" fill="${sett[0].hex}"/>`;
-      // Warp
-      svg += `<g opacity="0.85">`;
-      let x = 0;
-      for (const s of sym) { const w = s.width * sc; svg += `<rect x="${x}" y="0" width="${Math.ceil(w)}" height="${tile}" fill="${s.hex}"/>`; x += w; }
-      svg += `</g>`;
-      // Weft
-      svg += `<g opacity="0.55" style="mix-blend-mode:multiply">`;
-      let y = 0;
-      for (const s of sym) { const h = s.width * sc; svg += `<rect x="0" y="${y}" width="${tile}" height="${Math.ceil(h)}" fill="${s.hex}"/>`; y += h; }
-      svg += `</g></svg>`;
-      const uri = 'data:image/svg+xml,' + encodeURIComponent(svg);
-      document.body.style.backgroundImage = `url("${uri}")`;
-      document.body.style.backgroundSize = `${tile}px ${tile}px`;
-    }
+    changeTartan();
+    setInterval(changeTartan, 1000);
 
-    let last = -1;
-    function randomTartan() {
-      let idx;
-      do { idx = Math.floor(Math.random() * SETTS.length); } while (idx === last);
-      last = idx;
-      setBackground(parseSett(SETTS[idx]));
-    }
-
-    randomTartan();
-    setInterval(randomTartan, 1000);
+    // Theme toggle — syncs with homepage preference
+    (function() {
+      const toggle = document.getElementById('theme-toggle');
+      const stored = localStorage.getItem('dev-tartan-theme');
+      if (stored === 'dark') document.body.classList.add('dark-mode');
+      toggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('dev-tartan-theme', isDark ? 'dark' : 'light');
+      });
+    })();
   </script>
 </body>
 </html>
